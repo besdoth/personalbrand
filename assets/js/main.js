@@ -203,6 +203,14 @@
 
   function setShot(card, link) {
     if (!mShotImg) return;
+    const figure = $(".modal__shot", modal);
+    // Some projects opt out of a preview entirely.
+    if (card.dataset.noshot) {
+      if (figure) figure.style.display = "none";
+      mShotImg.removeAttribute("src");
+      return;
+    }
+    if (figure) figure.style.display = "";
     const explicit = card.dataset.shot; // optional local/remote image path
     const sources = [];
     if (explicit) sources.push(explicit);
