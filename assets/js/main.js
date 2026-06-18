@@ -188,7 +188,71 @@
   const mSummary = $("#modalSummary");
   const mBody = $("#modalBody");
   const mLink = $("#modalLink");
+  const mShotImg = $("#modalShotImg");
+  const mShotLoader = $("#modalShotLoader");
+  const mShotPlaceholder = $("#modalShotPlaceholder");
+  const mUrl = $("#modalUrl");
   let lastFocused = null;
+
+  /* Free, no-key screenshot services (rendered in the visitor's browser).
+     Tried in order; if all fail we fall back to a branded placeholder. */
+  const SHOT_SERVICES = [
+    (u) => "https://image.thum.io/get/width/1280/crop/960/noanimate/" + u,
+    (u) => "https://s.wordpress.com/mshots/v1/" + encodeURIComponent(u) + "?w=1280&h=800",
+  ];
+
+  function setShot(card, link) {
+    if (!mShotImg) return;
+    const explicit = card.dataset.shot; // optional local/remote image path
+    const sources = [];
+    if (explicit) sources.push(explicit);
+    if (link && link !== "#") SHOT_SERVICES.forEach((fn) => sources.push(fn(link)));
+
+    if (mUrl) {
+      mUrl.textContent =
+        link && link !== "#"
+          ? link.replace(/^https?:\/\//, "").replace(/\/$/, "")
+          : (card.dataset.title || "preview").toLowerCase().replace(/\s+/g, "") + " · preview";
+    }
+
+    if (mShotPlaceholder) {
+      const emojiEl = card.querySelector(".card__emoji");
+      const emoji = emojiEl ? emojiEl.textContent : "🖥️";
+      mShotPlaceholder.style.setProperty("--c", card.dataset.color || "#7a5cff");
+      mShotPlaceholder.innerHTML =
+        '<span class="ph-emoji">' + emoji + "</span>" +
+        '<span class="ph-name">' + (card.dataset.title || "") + "</span>" +
+        '<span class="ph-hint">Screenshot coming soon — add a live URL or image</span>';
+    }
+
+    let idx = 0;
+    mShotImg.classList.remove("loaded");
+
+    function showPlaceholder() {
+      mShotImg.style.display = "none";
+      if (mShotLoader) mShotLoader.style.display = "none";
+      if (mShotPlaceholder) mShotPlaceholder.style.display = "flex";
+    }
+    function tryNext() {
+      if (idx >= sources.length) return showPlaceholder();
+      if (mShotPlaceholder) mShotPlaceholder.style.display = "none";
+      if (mShotLoader) mShotLoader.style.display = "flex";
+      mShotImg.style.display = "block";
+      mShotImg.src = sources[idx++];
+    }
+    mShotImg.onload = function () {
+      mShotImg.classList.add("loaded");
+      if (mShotLoader) mShotLoader.style.display = "none";
+      if (mShotPlaceholder) mShotPlaceholder.style.display = "none";
+    };
+    mShotImg.onerror = tryNext;
+
+    if (sources.length) tryNext();
+    else {
+      mShotImg.removeAttribute("src");
+      showPlaceholder();
+    }
+  }
 
   function openModal(card) {
     if (!modal) return;
@@ -207,6 +271,7 @@
         mBody.appendChild(p);
       });
     const link = card.dataset.link || "#";
+    setShot(card, link);
     const showLink = SHOW_LIVE_LINKS && link !== "#";
     mLink.href = link;
     mLink.style.display = showLink ? "" : "none";
@@ -225,6 +290,11 @@
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    if (mShotImg) {
+      mShotImg.onload = mShotImg.onerror = null;
+      mShotImg.removeAttribute("src");
+      mShotImg.classList.remove("loaded");
+    }
     if (lastFocused) lastFocused.focus();
   }
 

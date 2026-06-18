@@ -36,9 +36,8 @@
 
   <!-- Nav -->
   <header class="nav" id="nav">
-    <a href="#top" class="nav__brand" data-magnetic>
+    <a href="#top" class="nav__brand" aria-label="Back to top" data-magnetic>
       <span class="nav__logo">⚡</span>
-      <span class="nav__name">Bes</span>
     </a>
     <nav class="nav__links" aria-label="Primary">
       <a href="#work" data-magnetic>Work</a>
@@ -300,6 +299,19 @@
       <button class="modal__close" data-close aria-label="Close">×</button>
       <span class="modal__tag" id="modalTag"></span>
       <h3 class="modal__title" id="modalTitle"></h3>
+      <figure class="modal__shot">
+        <div class="browser">
+          <div class="browser__bar">
+            <span class="browser__dots"><i></i><i></i><i></i></span>
+            <span class="browser__url" id="modalUrl"></span>
+          </div>
+          <div class="browser__viewport">
+            <div class="browser__placeholder" id="modalShotPlaceholder"></div>
+            <div class="browser__loader" id="modalShotLoader"><span class="spin"></span> Capturing live preview…</div>
+            <img id="modalShotImg" alt="Website preview" />
+          </div>
+        </div>
+      </figure>
       <p class="modal__summary" id="modalSummary"></p>
       <div class="modal__body" id="modalBody"></div>
       <div class="modal__actions">
