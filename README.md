@@ -69,3 +69,27 @@ python3 -m http.server 8000
 
 It's static — drop the folder on GitHub Pages, Netlify, Vercel, or Cloudflare
 Pages. For GitHub Pages: push to the repo, enable Pages on the branch root.
+
+## Analytics (who's visiting)
+
+Uses **Cloudflare Web Analytics** — privacy-first, cookie-free (no consent
+banner needed), free. Two ways to turn it on:
+
+1. **Automatic (recommended, zero code):** Cloudflare dashboard →
+   *Analytics & Logs → Web Analytics → Add a site* → enter `besiserver.co.uk`
+   → **Automatic setup** (works because the domain is proxied through
+   Cloudflare). Done — no code change.
+2. **In code:** grab your Web Analytics **token** (Manual setup in the same
+   place) and paste it into `CF_BEACON_TOKEN` in the analytics snippet at the
+   bottom of `index.html`. The beacon only loads when a token is present.
+
+Use **one** of the two, not both (avoids double-counting). You'll see visits,
+page views, top pages, referrers, countries, and device/browser breakdowns.
+
+## Mobile
+
+Built mobile-first: hamburger nav menu, content-height hero (`svh`, no iOS
+address-bar jump), bottom-sheet project modals, larger tap targets, and
+lightened background effects on phones for smoother scrolling. Interactions
+that need a pointer (custom cursor, 3D tilt, magnetic buttons) are disabled on
+touch devices automatically.

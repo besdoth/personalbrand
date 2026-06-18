@@ -33,6 +33,28 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
+  /* ---------------- Mobile nav menu ---------------- */
+  const navToggle = $("#navToggle");
+  if (navToggle && nav) {
+    const closeNav = () => {
+      nav.classList.remove("is-open");
+      navToggle.setAttribute("aria-expanded", "false");
+      navToggle.setAttribute("aria-label", "Open menu");
+    };
+    navToggle.addEventListener("click", () => {
+      const open = nav.classList.toggle("is-open");
+      navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      navToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    });
+    $$(".nav__links a").forEach((a) => a.addEventListener("click", closeNav));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeNav();
+    });
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 860) closeNav();
+    });
+  }
+
   /* ---------------- Reveal on scroll ---------------- */
   const revealEls = $$("[data-reveal]");
   const charEls = $$("[data-reveal-char]");

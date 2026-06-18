@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description" content="Bes — web developer & automation builder. Interactive portfolio of real-world automations and personal projects." />
   <meta name="theme-color" content="#0a0a12" />
   <title>Bes · Web Developer & Automation Builder</title>
@@ -39,7 +39,10 @@
     <a href="#top" class="nav__brand" aria-label="Back to top" data-magnetic>
       <span class="nav__logo">⚡</span>
     </a>
-    <nav class="nav__links" aria-label="Primary">
+    <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav__links" id="navLinks" aria-label="Primary">
       <a href="#work" data-magnetic>Work</a>
       <a href="#projects" data-magnetic>Projects</a>
       <a href="#about" data-magnetic>About</a>
@@ -329,5 +332,25 @@
   </div>
 
   <script src="assets/js/main.js"></script>
+
+  <!-- ============================================================
+       Visitor analytics — Cloudflare Web Analytics (privacy-first, no cookies)
+       Easiest: enable "Automatic Setup" in the Cloudflare dashboard
+       (Analytics & Logs → Web Analytics → Add a site) — needs NO code.
+       Alternative: paste your Web Analytics token below and it loads here.
+       Do NOT use both (it would double-count).
+       ============================================================ -->
+  <script>
+    (function () {
+      var CF_BEACON_TOKEN = ""; // <-- paste your Cloudflare Web Analytics token to enable
+      if (CF_BEACON_TOKEN) {
+        var s = document.createElement("script");
+        s.defer = true;
+        s.src = "https://static.cloudflareinsights.com/beacon.min.js";
+        s.setAttribute("data-cf-beacon", JSON.stringify({ token: CF_BEACON_TOKEN }));
+        document.head.appendChild(s);
+      }
+    })();
+  </script>
 </body>
 </html>
