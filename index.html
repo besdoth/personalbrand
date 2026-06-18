@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Bes — web developer & automation builder. Interactive portfolio of real-world automations and personal projects." />
+  <meta name="theme-color" content="#0a0a12" />
+  <title>Bes · Web Developer & Automation Builder</title>
+
+  <!-- Fonts (degrade gracefully to system fonts if offline) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Inline SVG favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <!-- Scroll progress bar -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- Custom cursor (desktop only) -->
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
+  <!-- Animated background -->
+  <div class="bg-canvas-wrap" aria-hidden="true">
+    <canvas id="constellation"></canvas>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="grain"></div>
+  </div>
+
+  <!-- Nav -->
+  <header class="nav" id="nav">
+    <a href="#top" class="nav__brand" data-magnetic>
+      <span class="nav__logo">⚡</span>
+      <span class="nav__name">Bes</span>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#work" data-magnetic>Work</a>
+      <a href="#projects" data-magnetic>Projects</a>
+      <a href="#about" data-magnetic>About</a>
+      <a href="#contact" class="nav__cta" data-magnetic>Let's talk</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero__inner">
+        <p class="hero__eyebrow reveal" data-reveal>
+          <span class="dot"></span> Available for new builds · 2026
+        </p>
+        <h1 class="hero__title">
+          <span class="line"><span class="word" data-reveal-char>I</span> <span class="word" data-reveal-char>build</span></span>
+          <span class="line"><span class="word grad" data-reveal-char>interactive</span> <span class="word grad" data-reveal-char>web</span></span>
+          <span class="line"><span class="word" data-reveal-char>&amp;</span> <span class="word" data-reveal-char>automations</span></span>
+        </h1>
+        <p class="hero__lede reveal" data-reveal>
+          Websites that feel alive and behind-the-scenes systems that quietly do the
+          boring work. Scroll down — everything you're about to see, I made move.
+        </p>
+        <div class="hero__cta reveal" data-reveal>
+          <a href="#work" class="btn btn--primary" data-magnetic>
+            See the work <span class="btn__arrow">↓</span>
+          </a>
+          <a href="#contact" class="btn btn--ghost" data-magnetic>Start a project</a>
+        </div>
+
+        <div class="hero__stats reveal" data-reveal>
+          <div class="stat">
+            <span class="stat__num" data-count="6">0</span>
+            <span class="stat__label">Builds shipped</span>
+          </div>
+          <div class="stat">
+            <span class="stat__num" data-count="100" data-suffix="%">0</span>
+            <span class="stat__label">Hand-coded</span>
+          </div>
+          <div class="stat">
+            <span class="stat__num" data-count="40" data-suffix="h+">0</span>
+            <span class="stat__label">Saved weekly by automations</span>
+          </div>
+        </div>
+      </div>
+
+      <a href="#work" class="hero__scroll" aria-label="Scroll to work">
+        <span class="hero__scroll-line"></span>
+        <span>scroll</span>
+      </a>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <span>Web Apps</span><span class="sep">✦</span>
+        <span>Workflow Automation</span><span class="sep">✦</span>
+        <span>n8n &amp; APIs</span><span class="sep">✦</span>
+        <span>Email Systems</span><span class="sep">✦</span>
+        <span>Trading Tools</span><span class="sep">✦</span>
+        <span>Interactive UX</span><span class="sep">✦</span>
+        <span>Web Apps</span><span class="sep">✦</span>
+        <span>Workflow Automation</span><span class="sep">✦</span>
+        <span>n8n &amp; APIs</span><span class="sep">✦</span>
+        <span>Email Systems</span><span class="sep">✦</span>
+        <span>Trading Tools</span><span class="sep">✦</span>
+        <span>Interactive UX</span><span class="sep">✦</span>
+      </div>
+    </div>
+
+    <!-- WORK / AUTOMATIONS -->
+    <section class="work" id="work">
+      <div class="section-head reveal" data-reveal>
+        <span class="section-head__index">01</span>
+        <h2 class="section-head__title">Automations &amp; client builds</h2>
+        <p class="section-head__sub">
+          Real systems I've built — each one removes manual work or turns a messy
+          process into something a single click can run. Click a card to dig in.
+        </p>
+      </div>
+
+      <div class="cards" id="workCards">
+        <!-- Card 1 -->
+        <article class="card reveal" data-reveal data-tilt
+          data-title="Birria Birria"
+          data-tag="Hospitality · Ordering & Ops"
+          data-link="#"
+          data-color="#ff7a59"
+          data-summary="An order-to-kitchen automation for a birria pop-up that turns scattered DMs and online orders into a single live prep queue."
+          data-details="Built a web ordering front end for a birria taco brand and wired it to an automation pipeline. Online orders, Instagram DMs and walk-up tickets all funnel into one normalized queue. The kitchen sees a live, auto-sorted prep list; customers get automatic status texts; and end-of-day sales + stock get rolled into a sheet without anyone touching a calculator.|Stack: responsive ordering site, n8n workflows, webhook + messaging APIs, Google Sheets as a lightweight backend.|Impact: cut order-handling time per ticket dramatically and killed the 'lost DM' problem on busy nights.">
+          <div class="card__glow"></div>
+          <div class="card__index">01</div>
+          <div class="card__emoji">🌮</div>
+          <h3 class="card__title">Birria Birria</h3>
+          <p class="card__tag">Hospitality · Ordering &amp; Ops</p>
+          <p class="card__desc">One live prep queue from online orders, DMs and walk-ups — plus auto status texts and end-of-day reporting.</p>
+          <span class="card__cta">Open case study →</span>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="card reveal" data-reveal data-tilt
+          data-title="Blood Testing Panel"
+          data-tag="Health · Data & Reporting"
+          data-link="#"
+          data-color="#ff5470"
+          data-summary="A blood-panel dashboard that ingests lab results and turns rows of numbers into a readable, color-coded health story."
+          data-details="Built a tool that takes raw blood-panel exports and instantly visualizes them: each marker is plotted against its healthy reference range, flagged green/amber/red, and tracked over time so trends jump out.|Stack: data-parsing layer, interactive charting front end, reference-range engine, automated PDF report generation.|Impact: replaced a manual, error-prone 'read the PDF and highlight things' process with a one-upload dashboard anyone can understand at a glance.">
+          <div class="card__glow"></div>
+          <div class="card__index">02</div>
+          <div class="card__emoji">🩸</div>
+          <h3 class="card__title">Blood Testing Panel</h3>
+          <p class="card__tag">Health · Data &amp; Reporting</p>
+          <p class="card__desc">Upload lab results, get a color-coded, trend-aware dashboard — and an auto-generated report.</p>
+          <span class="card__cta">Open case study →</span>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="card reveal" data-reveal data-tilt
+          data-title="Adobe Email Automations"
+          data-tag="Marketing · Email Ops"
+          data-link="#"
+          data-color="#7a5cff"
+          data-summary="An email production pipeline that automates the repetitive Adobe email work — building, templating and dispatching at scale."
+          data-details="Automated the grind of producing marketing emails inside an Adobe workflow: templated layouts populate from a content source, assets are pulled and resized automatically, and approved emails schedule themselves out — no copy-paste, no manual asset wrangling.|Stack: templating engine, asset automation, scheduling logic, API hooks into the Adobe/email stack.|Impact: turned a multi-hour manual email build into a near-instant, repeatable run with consistent branding every time.">
+          <div class="card__glow"></div>
+          <div class="card__index">03</div>
+          <div class="card__emoji">✉️</div>
+          <h3 class="card__title">Adobe Email Automations</h3>
+          <p class="card__tag">Marketing · Email Ops</p>
+          <p class="card__desc">Templated, asset-aware email builds that populate and schedule themselves — hours of work down to a click.</p>
+          <span class="card__cta">Open case study →</span>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="card reveal" data-reveal data-tilt
+          data-title="Trading Tool"
+          data-tag="Fintech · Data & Signals"
+          data-link="#"
+          data-color="#2dd4a7"
+          data-summary="A custom trading tool that pulls live market data, runs the rules I care about, and surfaces clean signals on one screen."
+          data-details="Built a trading dashboard that ingests live market data, applies a configurable set of indicators/rules, and presents alerts and a focused watchlist in real time — so decisions are based on a clear view instead of ten browser tabs.|Stack: market-data APIs, real-time charting, alerting/automation layer, configurable strategy rules.|Impact: consolidated scattered manual chart-watching into one automated, alert-driven cockpit.">
+          <div class="card__glow"></div>
+          <div class="card__index">04</div>
+          <div class="card__emoji">📈</div>
+          <h3 class="card__title">Trading Tool</h3>
+          <p class="card__tag">Fintech · Data &amp; Signals</p>
+          <p class="card__desc">Live market data in, configurable rules applied, clean real-time signals and alerts out.</p>
+          <span class="card__cta">Open case study →</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- PERSONAL PROJECTS -->
+    <section class="projects" id="projects">
+      <div class="section-head reveal" data-reveal>
+        <span class="section-head__index">02</span>
+        <h2 class="section-head__title">Personal projects</h2>
+        <p class="section-head__sub">
+          Things I built for the fun of it — where I get to be playful with interaction and ideas.
+        </p>
+      </div>
+
+      <div class="cards cards--two" id="projectCards">
+        <article class="card card--alt reveal" data-reveal data-tilt
+          data-title="Movie / Series Picker"
+          data-tag="Personal · Web App"
+          data-link="#"
+          data-color="#ffd166"
+          data-summary="Can't decide what to watch? This picks for you — filtered by mood, time and who's on the couch."
+          data-details="A 'stop scrolling Netflix' app. Tell it your mood, how long you've got and what you're into, and it narrows thousands of titles down to one confident pick (with a couple of backups).|Stack: movie/series data API, filtering + weighting logic, playful animated UI with a slot-machine style reveal.|Why: built to end the nightly 'what should we watch' negotiation at home.">
+          <div class="card__glow"></div>
+          <div class="card__emoji">🎬</div>
+          <h3 class="card__title">Movie / Series Picker</h3>
+          <p class="card__tag">Personal · Web App</p>
+          <p class="card__desc">Mood + time + company in, one confident pick out. The end of decision paralysis.</p>
+          <span class="card__cta">Take a look →</span>
+        </article>
+
+        <article class="card card--alt reveal" data-reveal data-tilt
+          data-title="Birthday Surprise"
+          data-tag="Personal · Interactive"
+          data-link="#"
+          data-color="#ff8fab"
+          data-summary="An interactive birthday experience — a personal, animated little web gift made to make someone smile."
+          data-details="A custom interactive web experience built as a birthday surprise: scroll- and click-driven animations, personal messages that reveal as you go, and a payoff moment at the end. Pure interaction craft, no template.|Stack: hand-built animations, scroll triggers, audio + motion, fully custom design.|Why: proof that a website can be a heartfelt gift, not just a brochure.">
+          <div class="card__glow"></div>
+          <div class="card__emoji">🎂</div>
+          <h3 class="card__title">Birthday Surprise</h3>
+          <p class="card__tag">Personal · Interactive</p>
+          <p class="card__desc">A bespoke, animated birthday experience — a website built to be a gift.</p>
+          <span class="card__cta">Take a look →</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about" id="about">
+      <div class="about__grid">
+        <div class="about__text reveal" data-reveal>
+          <span class="section-head__index">03</span>
+          <h2>I make the web do more — and do it beautifully.</h2>
+          <p>
+            I'm Bes, a web developer who lives in the overlap between
+            <strong>interactive front-end</strong> and <strong>automation</strong>.
+            One half of what I do is build sites that people actually enjoy moving
+            through. The other half is wiring up the systems behind them so the
+            repetitive work runs itself.
+          </p>
+          <p>
+            Whether it's a birria pop-up's order queue, a health dashboard, a
+            self-building email pipeline or a trading cockpit — I like taking a
+            messy manual process and turning it into something that just works.
+          </p>
+          <ul class="about__skills">
+            <li>Interactive UX</li>
+            <li>n8n &amp; Workflow Automation</li>
+            <li>APIs &amp; Webhooks</li>
+            <li>Data Dashboards</li>
+            <li>Email Systems</li>
+            <li>Front-end Engineering</li>
+          </ul>
+        </div>
+        <div class="about__visual reveal" data-reveal>
+          <div class="about__card" data-tilt>
+            <div class="about__card-row"><span>Status</span><b class="online">● Open to work</b></div>
+            <div class="about__card-row"><span>Focus</span><b>Web + Automation</b></div>
+            <div class="about__card-row"><span>Approach</span><b>Hand-coded, no templates</b></div>
+            <div class="about__card-row"><span>Vibe</span><b>Make it move</b></div>
+            <div class="about__card-spark"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact">
+      <div class="contact__inner reveal" data-reveal>
+        <span class="section-head__index">04</span>
+        <h2 class="contact__title">Got something that should <span class="grad">move</span>?</h2>
+        <p class="contact__sub">Tell me about the site or the manual process eating your time. I'll make it work.</p>
+        <a class="btn btn--primary btn--lg" id="emailBtn" href="mailto:besforth@icloud.com?subject=Let's%20build%20something" data-magnetic>
+          besforth@icloud.com <span class="btn__arrow">→</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>© <span id="year">2026</span> Bes — built by hand.</span>
+    <a href="#top" data-magnetic>Back to top ↑</a>
+  </footer>
+
+  <!-- PROJECT MODAL -->
+  <div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" role="document">
+      <button class="modal__close" data-close aria-label="Close">×</button>
+      <span class="modal__tag" id="modalTag"></span>
+      <h3 class="modal__title" id="modalTitle"></h3>
+      <p class="modal__summary" id="modalSummary"></p>
+      <div class="modal__body" id="modalBody"></div>
+      <div class="modal__actions">
+        <a class="btn btn--primary" id="modalLink" href="#" target="_blank" rel="noopener">
+          Visit live site <span class="btn__arrow">↗</span>
+        </a>
+        <button class="btn btn--ghost" data-close>Close</button>
+      </div>
+      <p class="modal__note">Live link is a placeholder — drop the real URL into the card's <code>data-link</code>.</p>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
