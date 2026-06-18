@@ -40,6 +40,7 @@ Everything is driven by `data-*` attributes on the `.card` elements in
 
 - **`data-link`** — the live site URL. (Birria Birria is set to `https://birria-birria.pages.dev/`, moving to `birriabirria.com` later.)
 - **`data-details`** — paragraphs separated by `|`; a leading `Word:` gets bolded automatically.
+- **`data-shot`** *(optional)* — path/URL to a screenshot image shown in the modal's browser frame, e.g. `data-shot="assets/screenshots/birria.png"`. If omitted but `data-link` is a real URL, a live screenshot is generated automatically (via a free screenshot service, with fallbacks). If neither exists, a branded placeholder is shown. Drop screenshot images into `assets/screenshots/`.
 
 ### Showing / hiding live links
 
