@@ -38,8 +38,21 @@ Everything is driven by `data-*` attributes on the `.card` elements in
   data-details="Paragraph one.|Stack: ...|Impact: ...">  <!-- split paragraphs with | -->
 ```
 
-- **`data-link`** — set this to the live site URL to enable the "Visit live site" button (it's hidden while the value is `#`).
+- **`data-link`** — the live site URL. (Birria Birria is set to `https://birria-birria.pages.dev/`, moving to `birriabirria.com` later.)
 - **`data-details`** — paragraphs separated by `|`; a leading `Word:` gets bolded automatically.
+
+### Showing / hiding live links
+
+All "Visit live site" buttons are **hidden globally** right now via a master
+switch at the top of `assets/js/main.js`:
+
+```js
+const SHOW_LIVE_LINKS = false; // flip to true to reveal live links
+```
+
+When you flip it to `true`, every card that has a real `data-link` (not `#`)
+will show its button automatically — so URLs can be stored ahead of time and
+revealed all at once.
 
 Update your email anywhere it appears (`mailto:` links) and the name/brand text in the nav and hero.
 

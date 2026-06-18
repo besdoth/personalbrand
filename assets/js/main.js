@@ -7,6 +7,11 @@
 (function () {
   "use strict";
 
+  /* Master switch for the "Visit live site" buttons in project modals.
+     Set to true when you're ready to show live links publicly.
+     Individual cards still need a real data-link (not "#") to appear. */
+  const SHOW_LIVE_LINKS = false;
+
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const isTouch = window.matchMedia("(hover: none)").matches;
   const $ = (s, c = document) => c.querySelector(s);
@@ -202,8 +207,12 @@
         mBody.appendChild(p);
       });
     const link = card.dataset.link || "#";
+    const showLink = SHOW_LIVE_LINKS && link !== "#";
     mLink.href = link;
-    mLink.style.display = link === "#" ? "none" : "";
+    mLink.style.display = showLink ? "" : "none";
+    const note = $(".modal__note", modal);
+    // Only nudge about a missing URL when links are switched on but this card has none.
+    if (note) note.style.display = SHOW_LIVE_LINKS && link === "#" ? "" : "none";
     const color = card.dataset.color;
     if (color) mTag.style.color = color;
     modal.classList.add("is-open");
