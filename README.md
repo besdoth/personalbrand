@@ -1,18 +1,18 @@
-# Bes — Interactive Portfolio
+# bes@portfolio — Terminal Portfolio
 
-A hand-coded, scroll-driven personal site that showcases my web-development and
-automation work. No frameworks, no build step — just HTML, CSS and vanilla JS,
-so the interaction craft *is* the portfolio.
+A hand-coded personal site styled as a **dev terminal / console** — boot
+sequence, typed hero, projects shown as a live `process list` you "inspect",
+and a `neofetch`-style about block. No frameworks, no build step — just HTML,
+CSS and vanilla JS, so the interaction craft *is* the portfolio.
 
 ## What's inside
 
-- **Scroll-driven reveals** — text and cards animate in as you scroll (IntersectionObserver).
-- **Custom cursor + magnetic buttons** — desktop pointer follows with easing; CTAs pull toward it.
-- **3D tilt cards** with a color glow that tracks the mouse.
-- **Animated constellation background** that reacts to the cursor, plus floating gradient blobs and parallax.
-- **Animated counters**, a looping skills marquee, and a scroll-progress bar.
-- **Project case-study modals** — click any card for the full story; each links out to the live site.
-- Fully **responsive** and respects `prefers-reduced-motion` and touch devices.
+- **Boot sequence** on first visit (once per session), then a **typed terminal hero**.
+- **Projects as a process list** — each row is a "running" process; click/Enter to `inspect` it (opens a terminal-window modal with a live preview).
+- **`neofetch`-style about block** with ASCII art + system-info rows.
+- **Block cursor**, scanline + grid screen FX, phosphor-green palette, animated counters, a status ticker, and a scroll-progress bar.
+- **Live project previews** — auto-screenshots live URLs (with fallbacks) or uses an uploaded image.
+- Fully **responsive** (hamburger menu, bottom-sheet modals) and respects `prefers-reduced-motion` and touch devices.
 
 ## Showcased work
 
@@ -25,22 +25,26 @@ so the interaction craft *is* the portfolio.
 
 ## Editing content
 
-Everything is driven by `data-*` attributes on the `.card` elements in
-`index.html`:
+Each project is a `.proc__row` in `index.html`, driven by `data-*` attributes:
 
 ```html
-<article class="card" data-tilt
-  data-title="Birria Birria"
-  data-tag="Hospitality · Ordering & Ops"
-  data-link="https://your-live-url.com"   <!-- replace # with the real URL -->
+<article class="proc__row" tabindex="0" role="button"
+  data-name="birria-birria"                 <!-- process name shown in the list -->
+  data-title="Birria Birria"                <!-- heading in the inspect modal -->
+  data-tag="hospitality · ops"              <!-- TYPE column -->
+  data-glyph="🌮"                            <!-- icon for the placeholder preview -->
+  data-link="https://your-live-url.com"     <!-- live URL ("#" = none) -->
   data-color="#ff7a59"
   data-summary="One-line hook shown in the modal."
   data-details="Paragraph one.|Stack: ...|Impact: ...">  <!-- split paragraphs with | -->
+  ...visible row cells...
+</article>
 ```
 
-- **`data-link`** — the live site URL. (Birria Birria is set to `https://birria-birria.pages.dev/`, moving to `birriabirria.com` later.)
+- **`data-link`** — the live site URL. (Birria Birria → `https://birria-birria.pages.dev/`, moving to `birriabirria.com` later.)
 - **`data-details`** — paragraphs separated by `|`; a leading `Word:` gets bolded automatically.
-- **`data-shot`** *(optional)* — path/URL to a screenshot image shown in the modal's browser frame, e.g. `data-shot="assets/screenshots/birria.png"`. If omitted but `data-link` is a real URL, a live screenshot is generated automatically (via a free screenshot service, with fallbacks). If neither exists, a branded placeholder is shown. Drop screenshot images into `assets/screenshots/`.
+- **`data-shot`** *(optional)* — path/URL to a screenshot image shown in the inspect modal, e.g. `data-shot="assets/screenshots/TradingBot.png"`. If omitted but `data-link` is a real URL, a live screenshot is generated automatically (free service, with fallbacks). If neither exists, a branded placeholder is shown. Drop images in `assets/screenshots/`.
+- **`data-noshot="true"`** — hide the preview frame entirely for that project.
 
 ### Showing / hiding live links
 
@@ -69,3 +73,27 @@ python3 -m http.server 8000
 
 It's static — drop the folder on GitHub Pages, Netlify, Vercel, or Cloudflare
 Pages. For GitHub Pages: push to the repo, enable Pages on the branch root.
+
+## Analytics (who's visiting)
+
+Uses **Cloudflare Web Analytics** — privacy-first, cookie-free (no consent
+banner needed), free. Two ways to turn it on:
+
+1. **Automatic (recommended, zero code):** Cloudflare dashboard →
+   *Analytics & Logs → Web Analytics → Add a site* → enter `besiserver.co.uk`
+   → **Automatic setup** (works because the domain is proxied through
+   Cloudflare). Done — no code change.
+2. **In code:** grab your Web Analytics **token** (Manual setup in the same
+   place) and paste it into `CF_BEACON_TOKEN` in the analytics snippet at the
+   bottom of `index.html`. The beacon only loads when a token is present.
+
+Use **one** of the two, not both (avoids double-counting). You'll see visits,
+page views, top pages, referrers, countries, and device/browser breakdowns.
+
+## Mobile
+
+Built mobile-first: hamburger nav menu, content-height hero (`svh`, no iOS
+address-bar jump), bottom-sheet project modals, larger tap targets, and
+lightened background effects on phones for smoother scrolling. Interactions
+that need a pointer (custom cursor, 3D tilt, magnetic buttons) are disabled on
+touch devices automatically.
