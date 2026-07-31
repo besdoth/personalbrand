@@ -137,25 +137,71 @@ img, svg { max-width: 100%; }
   .logo__name span { display: none; }
 }
 
-/* 5. hero + scene */
-.hero { height: 320vh; background: linear-gradient(var(--sky-50), var(--surface)); }
-.hero__sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  padding-top: var(--header-h);
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-}
-.hero__grid {
-  width: 100%;
+/* 5. story: pinned scene + scrolling chapters */
+.story { background: linear-gradient(var(--sky-50), var(--surface)); }
+.story__grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  align-items: center;
   gap: clamp(24px, 4vw, 56px);
 }
+/* both children share row 1 so the row height = content height,
+   giving the sticky scene its full-length track */
+.story__content { grid-column: 1; grid-row: 1; }
+.story__scenecol { grid-column: 2; grid-row: 1; }
+.story__scene {
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  height: calc(100svh - var(--header-h));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+#houseScene {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: calc(100svh - var(--header-h) - 40px);
+  filter: drop-shadow(0 14px 28px rgb(30 42 54 / 0.12));
+}
+.scene-caption {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: var(--shadow);
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--sky-700);
+  white-space: nowrap;
+}
+
+/* each chapter fills roughly a viewport so reading pace ≈ animation pace */
+.story__panel {
+  min-height: calc(100svh - var(--header-h));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(48px, 7vh, 80px);
+}
+.story__panel--finance {
+  background: linear-gradient(135deg, var(--sky-700), var(--sky-500));
+  color: #fff;
+  border-radius: calc(var(--radius) + 6px);
+  padding: clamp(24px, 4vw, 40px);
+  box-shadow: var(--shadow-lg);
+  min-height: 0;
+  margin-block: 10vh;
+}
+.story__panel--finance h2 { color: #fff; }
+.story__panel--finance .ticks li::before { background: var(--sun-400); }
+.story__panel--finance .rep-example { margin-top: 10px; }
+
 .eyebrow {
   font-size: 0.85rem;
   font-weight: 600;
@@ -170,47 +216,37 @@ img, svg { max-width: 100%; }
 .hero__points li { padding-left: 22px; position: relative; }
 .hero__points li::before { content: "✓"; position: absolute; left: 0; color: var(--leaf-500); font-weight: 800; }
 
-.hero__scene { position: relative; }
-#houseScene { display: block; width: 100%; height: auto; filter: drop-shadow(0 14px 28px rgb(30 42 54 / 0.12)); }
-.hero__caption {
-  text-align: center;
-  font-weight: 600;
-  color: var(--sky-700);
-  margin: 12px 0 0;
-  min-height: 1.6em;
-  transition: opacity 0.25s ease;
-}
-.hero__caption.is-swapping { opacity: 0; }
-.hero__scrollhint {
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
-  width: 34px; height: 34px;
-  color: var(--sky-700);
-  opacity: 0.85;
-  animation: hintBob 1.6s ease-in-out infinite;
-  transition: opacity 0.4s ease;
-}
-.hero__scrollhint.is-hidden { opacity: 0; }
-@keyframes hintBob {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(8px); }
-}
-
 @media (max-width: 820px) {
-  .hero { height: 260vh; }
-  .hero__grid { grid-template-columns: 1fr; gap: 8px; align-content: center; }
-  .hero__copy { text-align: center; }
-  .hero__copy h1 { font-size: clamp(1.65rem, 7vw, 2.4rem); }
-  .hero .eyebrow { display: none; }
+  .story__grid { display: block; }
+  /* dissolve the column box so the scene's sticky containing block becomes
+     the full-height story grid — otherwise it has no room to stick */
+  .story__scenecol { display: contents; }
+  /* mini scene pinned at the top; content scrolls beneath it */
+  .story__scene {
+    height: 36svh;
+    padding-bottom: 10px;
+    background: linear-gradient(var(--sky-50) 0%, var(--sky-50) 86%, rgb(240 247 255 / 0) 100%);
+  }
+  #houseScene {
+    width: auto;
+    height: 100%;
+    max-width: 96vw;
+    max-height: none;
+    margin-inline: auto;
+    filter: drop-shadow(0 8px 16px rgb(30 42 54 / 0.12));
+  }
+  .scene-caption { display: none; }
+  .story__panel { min-height: 0; padding-block: 34px; justify-content: flex-start; }
+  .story__panel--hero { text-align: center; }
+  .story__panel--hero h1 { font-size: clamp(1.65rem, 7vw, 2.4rem); }
+  .story__panel--hero .eyebrow { display: none; }
   .hero__sub { margin-inline: auto; font-size: 0.95rem; }
   .hero__ctas { justify-content: center; margin: 1rem 0 0; }
   .hero__ctas .btn--ghost { display: none; }
   .hero__points { display: none; }
-  .hero__scene { max-width: min(88vw, 36svh * 800 / 520); margin-inline: auto; }
-  .hero__caption { font-size: 0.9rem; margin-top: 8px; }
-  .hero__scrollhint { display: none; }
+  .story__panel--finance { margin-block: 24px; }
+  /* anchor jumps must clear the pinned mini scene */
+  html { scroll-padding-top: calc(var(--header-h) + 37svh); }
 }
 
 /* --- scene animation states --- */
@@ -230,8 +266,9 @@ img, svg { max-width: 100%; }
 .motion-ok #sunRays,
 .motion-ok .sparkle { opacity: 0; }
 
-/* one-shot settle flash when a panel lands */
-.motion-ok .panel.is-set rect:first-child { animation: settleFlash 0.45s ease-out; }
+/* one-shot settle flash when a panel lands (whole element — <use> shadow
+   content can't be targeted by outside selectors) */
+.motion-ok .panel.is-set { animation: settleFlash 0.45s ease-out; }
 @keyframes settleFlash {
   0% { filter: brightness(2.1); }
   100% { filter: brightness(1); }
@@ -297,16 +334,6 @@ img, svg { max-width: 100%; }
 }
 .step p { color: var(--slate-600); font-size: 0.95rem; margin: 0; }
 
-.finance { background: linear-gradient(135deg, var(--sky-700), var(--sky-500)); color: #fff; }
-.finance h2 { color: #fff; }
-.finance a:not(.btn) { color: #fff; }
-.finance .ticks li::before { background: var(--sun-400); }
-.finance__grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: clamp(28px, 5vw, 64px);
-  align-items: center;
-}
 .rep-example {
   background: var(--surface);
   color: var(--slate-900);
@@ -327,9 +354,6 @@ img, svg { max-width: 100%; }
 .rep-example dt { color: var(--slate-600); }
 .rep-example dd { margin: 0; font-weight: 600; }
 .rep-example .smallprint { margin-top: 1rem; }
-@media (max-width: 820px) {
-  .finance__grid { grid-template-columns: 1fr; }
-}
 
 .trust { padding-block: clamp(36px, 6vw, 56px); }
 .badges {
@@ -473,11 +497,7 @@ img, svg { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
-.no-motion .hero { height: auto; }
-.no-motion .hero__sticky { position: static; height: auto; padding-block: 40px calc(40px + var(--header-h)); }
-.no-motion .hero__scrollhint { display: none; }
-.no-motion .hero__caption { display: none; }
+.no-motion .scene-caption { display: none; }
 .no-motion .cloud,
-.no-motion .hero__scrollhint,
 .no-motion #fanBlades,
 .no-motion #sunRays { animation: none !important; }

@@ -38,11 +38,183 @@
 
   <main>
 
-    <!-- ============ HERO: scroll track + sticky animated scene ============ -->
-    <section class="hero" id="hero">
-      <div class="hero__sticky">
-        <div class="container hero__grid">
-          <div class="hero__copy">
+    <!-- ============ STORY: content scrolls past the pinned house scene ============ -->
+    <section class="story" id="hero">
+      <div class="container story__grid">
+
+        <div class="story__scenecol">
+          <div class="story__scene">
+            <svg id="houseScene" viewBox="0 0 720 620" role="img"
+                 aria-label="Illustration of a UK brick house having solar panels and an air source heat pump installed">
+              <defs>
+                <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#dceeff"/>
+                  <stop offset="1" stop-color="#f2f9ff"/>
+                </linearGradient>
+                <linearGradient id="panelGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#22406b"/>
+                  <stop offset="1" stop-color="#101f3a"/>
+                </linearGradient>
+                <radialGradient id="sunGlow" cx=".5" cy=".5" r=".5">
+                  <stop offset="0" stop-color="#ffd76a" stop-opacity=".9"/>
+                  <stop offset="1" stop-color="#ffd76a" stop-opacity="0"/>
+                </radialGradient>
+                <!-- one realistic panel, instanced 8 times below: silver frame,
+                     dark cell field, 6x3 cell grid, small glare -->
+                <g id="panelDef">
+                  <rect x="0" y="0" width="94" height="58" rx="3" fill="#cfd8e3"/>
+                  <rect x="3" y="3" width="88" height="52" rx="2" fill="url(#panelGrad)"/>
+                  <path d="M17.7 3v52M32.3 3v52M47 3v52M61.7 3v52M76.3 3v52M3 20.3h88M3 37.7h88" stroke="#3b5f92" stroke-width="1"/>
+                  <path d="M9 9l12 7" stroke="#9dc4ef" stroke-width="2.5" stroke-linecap="round"/>
+                </g>
+              </defs>
+
+              <!-- sky -->
+              <rect x="0" y="0" width="720" height="560" rx="24" fill="url(#skyGrad)"/>
+
+              <!-- clouds -->
+              <g class="cloud cloud--1" fill="#ffffff" opacity=".9">
+                <ellipse cx="170" cy="120" rx="44" ry="18"/>
+                <ellipse cx="206" cy="110" rx="30" ry="15"/>
+                <ellipse cx="140" cy="112" rx="26" ry="13"/>
+              </g>
+              <g class="cloud cloud--2" fill="#ffffff" opacity=".75">
+                <ellipse cx="560" cy="70" rx="38" ry="16"/>
+                <ellipse cx="592" cy="62" rx="25" ry="12"/>
+                <ellipse cx="532" cy="62" rx="22" ry="11"/>
+              </g>
+
+              <!-- sun -->
+              <g id="sun">
+                <circle cx="96" cy="96" r="68" fill="url(#sunGlow)"/>
+                <circle cx="96" cy="96" r="32" fill="#ffc93c"/>
+                <g id="sunRays" stroke="#ffc93c" stroke-width="6" stroke-linecap="round">
+                  <path d="M96 50V32"/>
+                  <path d="M96 142v18"/>
+                  <path d="M50 96H32"/>
+                  <path d="M142 96h18"/>
+                  <path d="M64 64L51 51"/>
+                  <path d="M128 128l13 13"/>
+                  <path d="M128 64l13-13"/>
+                  <path d="M64 128l-13 13"/>
+                </g>
+              </g>
+
+              <!-- ground -->
+              <rect x="0" y="548" width="720" height="72" rx="24" fill="#bfe3c0"/>
+              <rect x="0" y="548" width="720" height="10" fill="#a9d6ab"/>
+
+              <g id="house">
+                <!-- facade -->
+                <rect x="120" y="330" width="480" height="225" fill="#c96f4a"/>
+                <!-- brick texture -->
+                <g stroke="#b55e3b" stroke-width="2" opacity=".5">
+                  <path d="M120 360h480M120 390h480M120 420h480M120 450h480M120 480h480M120 510h480M120 540h480"/>
+                  <path d="M170 330v30M250 330v30M420 330v30M540 330v30M140 360v30M310 360v30M580 360v30M240 420v30M460 420v30M135 480v30M585 480v30M300 510v30M255 540v15M540 540v15"/>
+                </g>
+
+                <!-- roof (trapezoid, front-on) -->
+                <polygon points="90,330 160,180 560,180 630,330" fill="#3d4a57"/>
+                <rect x="84" y="326" width="552" height="10" rx="5" fill="#2e3944"/>
+
+                <!-- chimney -->
+                <g id="chimney">
+                  <rect x="470" y="110" width="46" height="80" fill="#b55e3b"/>
+                  <rect x="462" y="100" width="62" height="14" rx="4" fill="#9c4f31"/>
+                  <rect x="480" y="80" width="10" height="20" rx="3" fill="#77808a"/>
+                  <rect x="502" y="80" width="10" height="20" rx="3" fill="#77808a"/>
+                </g>
+
+                <!-- first-floor windows -->
+                <g class="window">
+                  <rect x="150" y="352" width="76" height="62" rx="4" fill="#ffffff"/>
+                  <rect x="156" y="358" width="64" height="50" rx="2" fill="#bfe0f5"/>
+                  <path d="M188 358v50M156 383h64" stroke="#ffffff" stroke-width="4"/>
+                </g>
+                <g class="window">
+                  <rect x="322" y="352" width="76" height="62" rx="4" fill="#ffffff"/>
+                  <rect x="328" y="358" width="64" height="50" rx="2" fill="#bfe0f5"/>
+                  <path d="M360 358v50M328 383h64" stroke="#ffffff" stroke-width="4"/>
+                </g>
+                <g class="window">
+                  <rect x="494" y="352" width="76" height="62" rx="4" fill="#ffffff"/>
+                  <rect x="500" y="358" width="64" height="50" rx="2" fill="#bfe0f5"/>
+                  <path d="M532 358v50M500 383h64" stroke="#ffffff" stroke-width="4"/>
+                </g>
+
+                <!-- ground-floor windows -->
+                <g class="window">
+                  <rect x="150" y="456" width="84" height="72" rx="4" fill="#ffffff"/>
+                  <rect x="156" y="462" width="72" height="60" rx="2" fill="#bfe0f5"/>
+                  <path d="M192 462v60M156 492h72" stroke="#ffffff" stroke-width="4"/>
+                </g>
+                <g class="window">
+                  <rect x="494" y="456" width="84" height="72" rx="4" fill="#ffffff"/>
+                  <rect x="500" y="462" width="72" height="60" rx="2" fill="#bfe0f5"/>
+                  <path d="M536 462v60M500 492h72" stroke="#ffffff" stroke-width="4"/>
+                </g>
+
+                <!-- door -->
+                <g id="door">
+                  <path d="M328 555v-83c0-17.7 14.3-32 32-32s32 14.3 32 32v83z" fill="#1b5e9e"/>
+                  <path d="M334 555v-77c0-14.4 11.6-26 26-26s26 11.6 26 26v77z" fill="#2f86d6"/>
+                  <circle cx="378" cy="505" r="4" fill="#ffd76a"/>
+                  <rect x="322" y="553" width="76" height="9" rx="3" fill="#8a949e"/>
+                </g>
+
+                <!-- bushes -->
+                <g fill="#2e9e5b">
+                  <ellipse cx="100" cy="548" rx="28" ry="20"/>
+                  <ellipse cx="130" cy="552" rx="19" ry="13" fill="#37b56b"/>
+                  <ellipse cx="585" cy="552" rx="17" ry="12"/>
+                </g>
+              </g>
+
+              <!-- solar panels: 2 rows x 4, authored in FINAL position; JS offsets them.
+                   Install order = DOM order: bottom row L->R, then top row. -->
+              <g id="panels">
+                <use class="panel" href="#panelDef" x="160" y="262"/>
+                <use class="panel" href="#panelDef" x="262" y="262"/>
+                <use class="panel" href="#panelDef" x="364" y="262"/>
+                <use class="panel" href="#panelDef" x="466" y="262"/>
+                <use class="panel" href="#panelDef" x="160" y="196"/>
+                <use class="panel" href="#panelDef" x="262" y="196"/>
+                <use class="panel" href="#panelDef" x="364" y="196"/>
+                <use class="panel" href="#panelDef" x="466" y="196"/>
+              </g>
+
+              <!-- air source heat pump -->
+              <g id="heatPump">
+                <rect x="612" y="486" width="92" height="62" rx="8" fill="#dfe6ec" stroke="#9aa7b2" stroke-width="2.5"/>
+                <circle cx="646" cy="517" r="20" fill="#c6d2db" stroke="#9aa7b2" stroke-width="2.5"/>
+                <g id="fanBlades" fill="#77808a">
+                  <path d="M646 517l-3-15c1-3 5-3 6 0z"/>
+                  <path d="M646 517l14.2 5.5c1.7 2.9-1.5 5.9-4.2 4.6z"/>
+                  <path d="M646 517l-11 10c-3.3.2-4.6-4-2.1-5.9z"/>
+                  <circle cx="646" cy="517" r="4.5"/>
+                </g>
+                <path d="M682 497h16M682 507h16M682 517h16M682 527h16" stroke="#9aa7b2" stroke-width="3" stroke-linecap="round"/>
+                <path d="M612 531h-14" stroke="#9aa7b2" stroke-width="5" stroke-linecap="round"/>
+                <rect x="618" y="548" width="10" height="8" fill="#9aa7b2"/>
+                <rect x="688" y="548" width="10" height="8" fill="#9aa7b2"/>
+              </g>
+
+              <!-- sparkles -->
+              <g id="sparkles" fill="#ffc93c">
+                <path class="sparkle" d="M198 104l4 10 10 4-10 4-4 10-4-10-10-4 10-4z"/>
+                <path class="sparkle" d="M614 130l3.5 8.5 8.5 3.5-8.5 3.5-3.5 8.5-3.5-8.5-8.5-3.5 8.5-3.5z"/>
+                <path class="sparkle" d="M56 264l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
+                <path class="sparkle" d="M666 434l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
+                <path class="sparkle" d="M352 76l3.5 8.5 8.5 3.5-8.5 3.5-3.5 8.5-3.5-8.5-8.5-3.5 8.5-3.5z"/>
+              </g>
+            </svg>
+            <p class="scene-caption" id="sceneCaption" aria-hidden="true">Scroll to install your panels&nbsp;↓</p>
+          </div>
+        </div>
+
+        <div class="story__content">
+
+          <div class="story__panel story__panel--hero">
             <p class="eyebrow">Solar panels · Air source heat pumps · UK-wide</p>
             <h1>Cut your energy bills with solar&nbsp;&amp; heat&nbsp;pumps</h1>
             <p class="hero__sub">
@@ -61,265 +233,86 @@
             </ul>
           </div>
 
-          <div class="hero__scene">
-            <svg id="houseScene" viewBox="0 0 800 520" role="img"
-                 aria-label="Illustration of a UK brick house having solar panels and an air source heat pump installed">
-              <defs>
-                <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#dceeff"/>
-                  <stop offset="1" stop-color="#f2f9ff"/>
-                </linearGradient>
-                <linearGradient id="panelGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#274c7f"/>
-                  <stop offset="1" stop-color="#16294a"/>
-                </linearGradient>
-                <radialGradient id="sunGlow" cx=".5" cy=".5" r=".5">
-                  <stop offset="0" stop-color="#ffd76a" stop-opacity=".9"/>
-                  <stop offset="1" stop-color="#ffd76a" stop-opacity="0"/>
-                </radialGradient>
-              </defs>
-
-              <!-- sky -->
-              <rect x="0" y="0" width="800" height="470" rx="24" fill="url(#skyGrad)"/>
-
-              <!-- clouds -->
-              <g class="cloud cloud--1" fill="#ffffff" opacity=".9">
-                <ellipse cx="150" cy="80" rx="42" ry="18"/>
-                <ellipse cx="185" cy="70" rx="30" ry="15"/>
-                <ellipse cx="120" cy="72" rx="26" ry="13"/>
-              </g>
-              <g class="cloud cloud--2" fill="#ffffff" opacity=".75">
-                <ellipse cx="650" cy="120" rx="36" ry="15"/>
-                <ellipse cx="680" cy="112" rx="24" ry="12"/>
-                <ellipse cx="624" cy="112" rx="22" ry="11"/>
-              </g>
-
-              <!-- sun -->
-              <g id="sun">
-                <circle cx="105" cy="150" r="70" fill="url(#sunGlow)"/>
-                <circle cx="105" cy="150" r="30" fill="#ffc93c"/>
-                <g id="sunRays" stroke="#ffc93c" stroke-width="6" stroke-linecap="round">
-                  <path d="M105 100v-16"/>
-                  <path d="M105 200v16"/>
-                  <path d="M55 150H39"/>
-                  <path d="M155 150h16"/>
-                  <path d="M70 115l-11-11"/>
-                  <path d="M140 185l11 11"/>
-                  <path d="M140 115l11-11"/>
-                  <path d="M70 185l-11 11"/>
-                </g>
-              </g>
-
-              <!-- ground -->
-              <rect x="0" y="452" width="800" height="68" rx="24" fill="#bfe3c0"/>
-              <rect x="0" y="452" width="800" height="10" fill="#a9d6ab"/>
-
-              <g id="house">
-                <!-- facade -->
-                <rect x="230" y="285" width="340" height="180" fill="#c96f4a"/>
-                <!-- brick texture -->
-                <g stroke="#b55e3b" stroke-width="2" opacity=".55">
-                  <path d="M230 315h340M230 345h340M230 375h340M230 405h340M230 435h340"/>
-                  <path d="M270 285v30M330 285v30M450 285v30M510 285v30M300 315v30M420 315v30M540 315v30M255 345v30M475 345v30M545 375v30M250 405v30M545 435v30"/>
-                </g>
-
-                <!-- roof (trapezoid, front-on) -->
-                <polygon points="200,285 270,165 530,165 600,285" fill="#3d4a57"/>
-                <rect x="196" y="281" width="408" height="10" rx="5" fill="#2e3944"/>
-
-                <!-- chimney -->
-                <g id="chimney">
-                  <rect x="478" y="102" width="40" height="72" fill="#b55e3b"/>
-                  <rect x="472" y="94" width="52" height="14" rx="4" fill="#9c4f31"/>
-                  <rect x="486" y="76" width="10" height="18" rx="3" fill="#77808a"/>
-                  <rect x="502" y="76" width="10" height="18" rx="3" fill="#77808a"/>
-                </g>
-
-                <!-- first-floor windows -->
-                <g class="window">
-                  <rect x="252" y="308" width="64" height="56" rx="4" fill="#ffffff"/>
-                  <rect x="258" y="314" width="52" height="44" rx="2" fill="#bfe0f5"/>
-                  <path d="M284 314v44M258 336h52" stroke="#ffffff" stroke-width="4"/>
-                </g>
-                <g class="window">
-                  <rect x="368" y="308" width="64" height="56" rx="4" fill="#ffffff"/>
-                  <rect x="374" y="314" width="52" height="44" rx="2" fill="#bfe0f5"/>
-                  <path d="M400 314v44M374 336h52" stroke="#ffffff" stroke-width="4"/>
-                </g>
-                <g class="window">
-                  <rect x="484" y="308" width="64" height="56" rx="4" fill="#ffffff"/>
-                  <rect x="490" y="314" width="52" height="44" rx="2" fill="#bfe0f5"/>
-                  <path d="M516 314v44M490 336h52" stroke="#ffffff" stroke-width="4"/>
-                </g>
-
-                <!-- ground-floor windows -->
-                <g class="window">
-                  <rect x="252" y="392" width="70" height="62" rx="4" fill="#ffffff"/>
-                  <rect x="258" y="398" width="58" height="50" rx="2" fill="#bfe0f5"/>
-                  <path d="M287 398v50M258 423h58" stroke="#ffffff" stroke-width="4"/>
-                </g>
-                <g class="window">
-                  <rect x="478" y="392" width="70" height="62" rx="4" fill="#ffffff"/>
-                  <rect x="484" y="398" width="58" height="50" rx="2" fill="#bfe0f5"/>
-                  <path d="M513 398v50M484 423h58" stroke="#ffffff" stroke-width="4"/>
-                </g>
-
-                <!-- door -->
-                <g id="door">
-                  <path d="M372 465v-64c0-15.5 12.5-28 28-28s28 12.5 28 28v64z" fill="#1b5e9e"/>
-                  <path d="M378 465v-58c0-12.2 9.8-22 22-22s22 9.8 22 22v58z" fill="#2f86d6"/>
-                  <circle cx="416" cy="420" r="3.5" fill="#ffd76a"/>
-                  <rect x="366" y="463" width="68" height="8" rx="3" fill="#8a949e"/>
-                </g>
-
-                <!-- bushes -->
-                <g fill="#2e9e5b">
-                  <ellipse cx="212" cy="452" rx="26" ry="18"/>
-                  <ellipse cx="238" cy="456" rx="18" ry="12" fill="#37b56b"/>
-                  <ellipse cx="566" cy="454" rx="22" ry="16"/>
-                  <ellipse cx="588" cy="458" rx="15" ry="10" fill="#37b56b"/>
-                </g>
-              </g>
-
-              <!-- solar panels: authored in FINAL position; JS offsets them initially.
-                   Install order = DOM order: bottom row L→R, middle row, top row. -->
-              <g id="panels">
-                <!-- bottom row (4) : y 248..280 -->
-                <g class="panel"><rect x="236" y="248" width="76" height="32" rx="4" fill="url(#panelGrad)" stroke="#0e1c33" stroke-width="2"/><path d="M261 250v28M287 250v28M238 264h72" stroke="#4d78b8" stroke-width="1.6"/><path d="M241 252l8 4" stroke="#9dc4ef" stroke-width="2.4" stroke-linecap="round"/></g>
-                <g class="panel"><rect x="320" y="248" width="76" height="32" rx="4" fill="url(#panelGrad)" stroke="#0e1c33" stroke-width="2"/><path d="M345 250v28M371 250v28M322 264h72" stroke="#4d78b8" stroke-width="1.6"/><path d="M325 252l8 4" stroke="#9dc4ef" stroke-width="2.4" stroke-linecap="round"/></g>
-                <g class="panel"><rect x="404" y="248" width="76" height="32" rx="4" fill="url(#panelGrad)" stroke="#0e1c33" stroke-width="2"/><path d="M429 250v28M455 250v28M406 264h72" stroke="#4d78b8" stroke-width="1.6"/><path d="M409 252l8 4" stroke="#9dc4ef" stroke-width="2.4" stroke-linecap="round"/></g>
-                <g class="panel"><rect x="488" y="248" width="76" height="32" rx="4" fill="url(#panelGrad)" stroke="#0e1c33" stroke-width="2"/><path d="M513 250v28M539 250v28M490 264h72" stroke="#4d78b8" stroke-width="1.6"/><path d="M493 252l8 4" stroke="#9dc4ef" stroke-width="2.4" stroke-linecap="round"/></g>
-                <!-- middle row (3) : y 210..242 -->
-                <g class="panel"><rect x="278" y="210" width="76" height="32" rx="4" fill="url(#panelGrad)" stroke="#0e1c33" stroke-width="2"/><path d="M303 212v28M329 212v28M280 226h72" stroke="#4d78b8" stroke-width="1.6"/><path d="M283 214l8 4" stroke="#9dc4ef" stroke-width="2.4" stroke-linecap="round"/></g>
-                <g class="panel"><rect x="362" y="210" width="76" height="32" rx="4" fill="url(#panelGrad)" stroke="#0e1c33" stroke-width="2"/><path d="M387 212v28M413 212v28M364 226h72" stroke="#4d78b8" stroke-width="1.6"/><path d="M367 214l8 4" stroke="#9dc4ef" stroke-width="2.4" stroke-linecap="round"/></g>
-                <g class="panel"><rect x="446" y="210" width="76" height="32" rx="4" fill="url(#panelGrad)" stroke="#0e1c33" stroke-width="2"/><path d="M471 212v28M497 212v28M448 226h72" stroke="#4d78b8" stroke-width="1.6"/><path d="M451 214l8 4" stroke="#9dc4ef" stroke-width="2.4" stroke-linecap="round"/></g>
-                <!-- top row (2) : y 172..204 -->
-                <g class="panel"><rect x="320" y="172" width="76" height="32" rx="4" fill="url(#panelGrad)" stroke="#0e1c33" stroke-width="2"/><path d="M345 174v28M371 174v28M322 188h72" stroke="#4d78b8" stroke-width="1.6"/><path d="M325 176l8 4" stroke="#9dc4ef" stroke-width="2.4" stroke-linecap="round"/></g>
-                <g class="panel"><rect x="404" y="172" width="76" height="32" rx="4" fill="url(#panelGrad)" stroke="#0e1c33" stroke-width="2"/><path d="M429 174v28M455 174v28M406 188h72" stroke="#4d78b8" stroke-width="1.6"/><path d="M409 176l8 4" stroke="#9dc4ef" stroke-width="2.4" stroke-linecap="round"/></g>
-              </g>
-
-              <!-- air source heat pump -->
-              <g id="heatPump">
-                <rect x="612" y="398" width="92" height="60" rx="8" fill="#dfe6ec" stroke="#9aa7b2" stroke-width="2.5"/>
-                <circle id="fanRing" cx="644" cy="428" r="19" fill="#c6d2db" stroke="#9aa7b2" stroke-width="2.5"/>
-                <g id="fanBlades" fill="#77808a">
-                  <path d="M644 428l-3-14c1-3 5-3 6 0z"/>
-                  <path d="M644 428l13.6 5.2c1.6 2.8-1.4 5.6-4 4.4z"/>
-                  <path d="M644 428l-10.6 9.6c-3.2.2-4.4-3.8-2-5.6z"/>
-                  <circle cx="644" cy="428" r="4"/>
-                </g>
-                <path d="M678 408h18M678 418h18M678 428h18M678 438h18" stroke="#9aa7b2" stroke-width="3" stroke-linecap="round"/>
-                <path d="M612 442h-22" stroke="#9aa7b2" stroke-width="5" stroke-linecap="round"/>
-                <rect x="616" y="458" width="10" height="8" fill="#9aa7b2"/>
-                <rect x="690" y="458" width="10" height="8" fill="#9aa7b2"/>
-              </g>
-
-              <!-- sparkles -->
-              <g id="sparkles" fill="#ffc93c">
-                <path class="sparkle" d="M232 148l4 10 10 4-10 4-4 10-4-10-10-4 10-4z"/>
-                <path class="sparkle" d="M584 130l3.5 8.5 8.5 3.5-8.5 3.5-3.5 8.5-3.5-8.5-8.5-3.5 8.5-3.5z"/>
-                <path class="sparkle" d="M626 356l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
-                <path class="sparkle" d="M172 262l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
-                <path class="sparkle" d="M400 118l3.5 8.5 8.5 3.5-8.5 3.5-3.5 8.5-3.5-8.5-8.5-3.5 8.5-3.5z"/>
-              </g>
-            </svg>
-            <p class="hero__caption" id="sceneCaption" aria-hidden="true">Scroll to install your panels&nbsp;↓</p>
+          <div class="story__panel" id="benefits" aria-labelledby="benefits-title">
+            <h2 id="benefits-title">Why make the switch?</h2>
+            <p class="section__lead">Solar and heat pumps aren't just greener — they can seriously cut what you pay every month.</p>
+            <div class="cards">
+              <article class="card">
+                <div class="card__icon" aria-hidden="true">💷</div>
+                <h3>Lower energy bills</h3>
+                <p>Generate your own electricity and heat your home more efficiently — many households cut their bills significantly from day one.</p>
+              </article>
+              <article class="card">
+                <div class="card__icon" aria-hidden="true">🔌</div>
+                <h3>Get paid to export</h3>
+                <p>With the Smart Export Guarantee (SEG), your energy supplier pays you for the spare electricity your panels send back to the grid.</p>
+              </article>
+              <article class="card">
+                <div class="card__icon" aria-hidden="true">🏷️</div>
+                <h3>£7,500 heat pump grant</h3>
+                <p>The government's Boiler Upgrade Scheme offers eligible homes £7,500 off the cost of an air source heat pump installation.</p>
+              </article>
+              <article class="card">
+                <div class="card__icon" aria-hidden="true">🧾</div>
+                <h3>0% VAT on installation</h3>
+                <p>Solar panels and heat pumps currently qualify for 0% VAT in the UK — meaning more of your money goes into your system.</p>
+              </article>
+            </div>
+            <p class="smallprint">Savings and grant figures are indicative and depend on your home, energy usage and eligibility. We'll confirm exact numbers in your free quotation.</p>
           </div>
-        </div>
 
-        <div class="hero__scrollhint" id="scrollHint" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
-        </div>
-      </div>
-    </section>
+          <div class="story__panel" id="how" aria-labelledby="how-title">
+            <h2 id="how-title">How it works</h2>
+            <p class="section__lead">From enquiry to switching on — we keep it simple.</p>
+            <ol class="steps">
+              <li class="step">
+                <span class="step__num" aria-hidden="true">1</span>
+                <h3>Enquire</h3>
+                <p>Fill in our 60-second form. No obligation, no pressure.</p>
+              </li>
+              <li class="step">
+                <span class="step__num" aria-hidden="true">2</span>
+                <h3>Free survey &amp; quote</h3>
+                <p>We call you back, then arrange a free home survey and a tailored quotation.</p>
+              </li>
+              <li class="step">
+                <span class="step__num" aria-hidden="true">3</span>
+                <h3>Installation</h3>
+                <p>Our MCS-certified engineers install your system — typically in 1–2 days.</p>
+              </li>
+              <li class="step">
+                <span class="step__num" aria-hidden="true">4</span>
+                <h3>Start saving</h3>
+                <p>Switch on, watch your bills drop, and get paid for what you export.</p>
+              </li>
+            </ol>
+          </div>
 
-    <!-- ============ BENEFITS ============ -->
-    <section class="section" id="benefits" aria-labelledby="benefits-title">
-      <div class="container">
-        <h2 id="benefits-title">Why make the switch?</h2>
-        <p class="section__lead">Solar and heat pumps aren't just greener — they can seriously cut what you pay every month.</p>
-        <div class="cards">
-          <article class="card">
-            <div class="card__icon" aria-hidden="true">💷</div>
-            <h3>Lower energy bills</h3>
-            <p>Generate your own electricity and heat your home more efficiently — many households cut their bills significantly from day one.</p>
-          </article>
-          <article class="card">
-            <div class="card__icon" aria-hidden="true">🔌</div>
-            <h3>Get paid to export</h3>
-            <p>With the Smart Export Guarantee (SEG), your energy supplier pays you for the spare electricity your panels send back to the grid.</p>
-          </article>
-          <article class="card">
-            <div class="card__icon" aria-hidden="true">🏷️</div>
-            <h3>£7,500 heat pump grant</h3>
-            <p>The government's Boiler Upgrade Scheme offers eligible homes £7,500 off the cost of an air source heat pump installation.</p>
-          </article>
-          <article class="card">
-            <div class="card__icon" aria-hidden="true">🧾</div>
-            <h3>0% VAT on installation</h3>
-            <p>Solar panels and heat pumps currently qualify for 0% VAT in the UK — meaning more of your money goes into your system.</p>
-          </article>
-        </div>
-        <p class="smallprint">Savings and grant figures are indicative and depend on your home, energy usage and eligibility. We'll confirm exact numbers in your free quotation.</p>
-      </div>
-    </section>
+          <div class="story__panel story__panel--finance" id="finance" aria-labelledby="finance-title">
+            <h2 id="finance-title">Spread the cost with our finance deals</h2>
+            <p>Don't want to pay everything upfront? We offer flexible finance plans so you can start saving on your bills straight away — often for less per month than the savings your system makes.</p>
+            <ul class="ticks">
+              <li>Low-deposit and £0-upfront options</li>
+              <li>Fixed monthly payments</li>
+              <li>Quick decisions, simple paperwork</li>
+            </ul>
+            <p><a class="btn btn--primary" href="#quote">Ask about finance in my quote</a></p>
+            <aside class="rep-example" aria-label="Representative finance example">
+              <h3>Representative example</h3>
+              <!-- PLACEHOLDER: replace with your lender's real representative example before going live -->
+              <dl>
+                <div><dt>Cash price</dt><dd>£8,995</dd></div>
+                <div><dt>Deposit</dt><dd>£0</dd></div>
+                <div><dt>Term</dt><dd>120 months</dd></div>
+                <div><dt>Monthly payment</dt><dd>£99.44</dd></div>
+                <div><dt>Representative APR</dt><dd>5.9% APR</dd></div>
+                <div><dt>Total payable</dt><dd>£11,932.80</dd></div>
+              </dl>
+              <p class="smallprint">Placeholder figures for illustration only. Finance subject to status and affordability checks. Terms and conditions apply. UK residents 18+.</p>
+            </aside>
+          </div>
 
-    <!-- ============ HOW IT WORKS ============ -->
-    <section class="section section--alt" id="how" aria-labelledby="how-title">
-      <div class="container">
-        <h2 id="how-title">How it works</h2>
-        <p class="section__lead">From enquiry to switching on — we keep it simple.</p>
-        <ol class="steps">
-          <li class="step">
-            <span class="step__num" aria-hidden="true">1</span>
-            <h3>Enquire</h3>
-            <p>Fill in our 60-second form. No obligation, no pressure.</p>
-          </li>
-          <li class="step">
-            <span class="step__num" aria-hidden="true">2</span>
-            <h3>Free survey &amp; quote</h3>
-            <p>We call you back, then arrange a free home survey and a tailored quotation.</p>
-          </li>
-          <li class="step">
-            <span class="step__num" aria-hidden="true">3</span>
-            <h3>Installation</h3>
-            <p>Our MCS-certified engineers install your system — typically in 1–2 days.</p>
-          </li>
-          <li class="step">
-            <span class="step__num" aria-hidden="true">4</span>
-            <h3>Start saving</h3>
-            <p>Switch on, watch your bills drop, and get paid for what you export.</p>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- ============ FINANCE ============ -->
-    <section class="section finance" id="finance" aria-labelledby="finance-title">
-      <div class="container finance__grid">
-        <div>
-          <h2 id="finance-title">Spread the cost with our finance deals</h2>
-          <p>Don't want to pay everything upfront? We offer flexible finance plans so you can start saving on your bills straight away — often for less per month than the savings your system makes.</p>
-          <ul class="ticks">
-            <li>Low-deposit and £0-upfront options</li>
-            <li>Fixed monthly payments</li>
-            <li>Quick decisions, simple paperwork</li>
-          </ul>
-          <a class="btn btn--primary" href="#quote">Ask about finance in my quote</a>
         </div>
-        <aside class="rep-example" aria-label="Representative finance example">
-          <h3>Representative example</h3>
-          <!-- PLACEHOLDER: replace with your lender's real representative example before going live -->
-          <dl>
-            <div><dt>Cash price</dt><dd>£8,995</dd></div>
-            <div><dt>Deposit</dt><dd>£0</dd></div>
-            <div><dt>Term</dt><dd>120 months</dd></div>
-            <div><dt>Monthly payment</dt><dd>£99.44</dd></div>
-            <div><dt>Representative APR</dt><dd>5.9% APR</dd></div>
-            <div><dt>Total payable</dt><dd>£11,932.80</dd></div>
-          </dl>
-          <p class="smallprint">Placeholder figures for illustration only. Finance subject to status and affordability checks. Terms and conditions apply. UK residents 18+.</p>
-        </aside>
       </div>
     </section>
 

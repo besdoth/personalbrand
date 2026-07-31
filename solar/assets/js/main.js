@@ -19,20 +19,21 @@
   const sunRays = document.getElementById("sunRays");
   const sparkles = Array.from(document.querySelectorAll("#sparkles .sparkle"));
   const caption = document.getElementById("sceneCaption");
-  const scrollHint = document.getElementById("scrollHint");
 
-  /* progress windows over p ∈ [0, 1] */
+  /* progress windows over p ∈ [0, 1] of the story track:
+     panels build through the hero + benefits chapters, the heat pump
+     arrives around "how it works", everything is done before the form */
   const TIMELINE = {
-    panels: { start: 0.05, end: 0.68 },
-    heatPump: { start: 0.7, end: 0.85 },
-    sunRays: { start: 0.85, end: 0.94 },
-    sparkles: { start: 0.88, end: 1.0 },
+    panels: { start: 0.04, end: 0.6 },
+    heatPump: { start: 0.62, end: 0.78 },
+    sunRays: { start: 0.78, end: 0.88 },
+    sparkles: { start: 0.84, end: 0.96 },
   };
 
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
   const easeOutBack = (t) => {
-    const c1 = 1.70158;
+    const c1 = 0.9; // gentle ~8% overshoot — a soft settle, not a snap
     const c3 = c1 + 1;
     return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
   };
@@ -40,20 +41,20 @@
   const local = (p, start, end) => clamp((p - start) / (end - start), 0, 1);
 
   function applyScene(p) {
-    // panels: staggered fly-in, bottom row first, with overshoot "snap"
+    // panels: long-overlap staggered glide-in, bottom row first
     const { start, end } = TIMELINE.panels;
     const slot = (end - start) / panels.length;
     panels.forEach((panel, i) => {
-      const t = clamp((p - (start + i * slot * 0.78)) / (slot * 2), 0, 1);
+      const t = clamp((p - (start + i * slot * 0.65)) / (slot * 2.8), 0, 1);
       if (t <= 0) {
         panel.style.opacity = "0";
-        panel.style.transform = "translateY(-140px) scale(0.6)";
+        panel.style.transform = "translateY(-110px) scale(0.75)";
         panel.classList.remove("is-set");
         return;
       }
       const e = easeOutBack(t);
       panel.style.opacity = String(clamp(t * 3, 0, 1));
-      panel.style.transform = `translateY(${(-140 * (1 - e)).toFixed(1)}px) scale(${(0.6 + 0.4 * e).toFixed(3)})`;
+      panel.style.transform = `translateY(${(-110 * (1 - e)).toFixed(1)}px) scale(${(0.75 + 0.25 * e).toFixed(3)})`;
       panel.classList.toggle("is-set", t >= 1);
     });
 
@@ -81,8 +82,6 @@
       sp.style.transform = `scale(${(0.4 + 0.8 * wave).toFixed(3)})`;
     });
 
-    // caption + scroll hint
-    if (scrollHint) scrollHint.classList.toggle("is-hidden", p > 0.02);
     setCaption(
       p < 0.03 ? "Scroll to install your panels ↓"
       : p < TIMELINE.panels.end ? "Installing your solar panels…"
@@ -98,23 +97,42 @@
     caption.textContent = text;
   }
 
-  /* ---------- scroll driver (rAF on demand) ---------- */
-  let frameQueued = false;
+  /* ---------- scroll driver: lerp-smoothed progress ----------
+     `targetP` tracks the scrollbar; `currentP` glides toward it each frame,
+     so flick-scrolls produce a fluid catch-up rather than a hard jump.
+     rAF runs only while the two disagree, then stops. */
+  let targetP = 0;
+  let currentP = 0;
+  let rafId = null;
+  let lastT = 0;
+  const EPS = 0.0004;
 
-  function progress() {
-    const rect = track.getBoundingClientRect();
+  function targetProgress() {
     const range = track.offsetHeight - window.innerHeight;
     if (range <= 0) return 1;
-    return clamp(-rect.top / range, 0, 1);
+    return clamp(-track.getBoundingClientRect().top / range, 0, 1);
   }
 
-  function requestFrame() {
-    if (frameQueued) return;
-    frameQueued = true;
-    requestAnimationFrame(() => {
-      frameQueued = false;
-      applyScene(progress());
-    });
+  function tick(now) {
+    const dt = Math.min(48, now - lastT);
+    lastT = now;
+    // frame-rate-independent smoothing, ≈0.12 per frame at 60Hz
+    currentP += (targetP - currentP) * (1 - Math.exp(-dt / 90));
+    if (Math.abs(targetP - currentP) < EPS) {
+      currentP = targetP;
+      rafId = null;
+    } else {
+      rafId = requestAnimationFrame(tick);
+    }
+    applyScene(currentP);
+  }
+
+  function kick() {
+    targetP = targetProgress();
+    if (rafId === null) {
+      lastT = performance.now();
+      rafId = requestAnimationFrame(tick);
+    }
   }
 
   function resetSceneToFinished() {
@@ -127,21 +145,24 @@
 
   function applyMotionPref() {
     if (motionQuery.matches) {
+      if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
       root.classList.remove("motion-ok");
       root.classList.add("no-motion");
       resetSceneToFinished();
     } else {
       root.classList.remove("no-motion");
       root.classList.add("motion-ok");
-      requestFrame();
+      // snap straight to the scroll position (no replay on mid-page loads)
+      currentP = targetP = targetProgress();
+      applyScene(currentP);
     }
   }
 
   if (track && panels.length) {
     applyMotionPref();
     motionQuery.addEventListener("change", applyMotionPref);
-    window.addEventListener("scroll", () => { if (!motionQuery.matches) requestFrame(); }, { passive: true });
-    window.addEventListener("resize", () => { if (!motionQuery.matches) requestFrame(); });
+    window.addEventListener("scroll", () => { if (!motionQuery.matches) kick(); }, { passive: true });
+    window.addEventListener("resize", () => { if (!motionQuery.matches) kick(); });
   }
 
   /* ---------- quote form ---------- */
