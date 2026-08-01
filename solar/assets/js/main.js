@@ -16,7 +16,7 @@
   const track = document.getElementById("hero");
   const panels = Array.from(document.querySelectorAll("#panels .panel"));
   const heatPump = document.getElementById("heatPump");
-  const sunRays = document.getElementById("sunRays");
+  const homeGlow = document.getElementById("homeGlow");
   const sparkles = Array.from(document.querySelectorAll("#sparkles .sparkle"));
   const caption = document.getElementById("sceneCaption");
 
@@ -26,7 +26,7 @@
   const TIMELINE = {
     panels: { start: 0.04, end: 0.6 },
     heatPump: { start: 0.62, end: 0.78 },
-    sunRays: { start: 0.78, end: 0.88 },
+    homeGlow: { start: 0.78, end: 0.88 },
     sparkles: { start: 0.84, end: 0.96 },
   };
 
@@ -51,7 +51,7 @@
   };
   const panelC = panels.map(centreOf);
   const sparkleC = sparkles.map(centreOf);
-  const raysC = sunRays ? centreOf(sunRays) : { cx: 0, cy: 0 };
+  const glowC = homeGlow ? centreOf(homeGlow) : { cx: 0, cy: 0 };
 
   function setPose(el, c, { dx = 0, dy = 0, s = 1, rot = 0 }) {
     el.setAttribute(
@@ -92,12 +92,12 @@
     heatPump.setAttribute("transform", `translate(${(80 * (1 - ep)).toFixed(2)} 0)`);
     heatPump.classList.toggle("is-on", tp >= 1);
 
-    // sun rays grow in, then pulse via CSS
-    const tr = local(p, TIMELINE.sunRays.start, TIMELINE.sunRays.end);
+    // finale: the home "switches on" — warm windows + soft glow fade in
+    const tr = local(p, TIMELINE.homeGlow.start, TIMELINE.homeGlow.end);
     const er = easeOutCubic(tr);
-    sunRays.style.opacity = String(er);
-    setPose(sunRays, raysC, { s: 0.5 + 0.5 * er });
-    sunRays.classList.toggle("is-on", tr >= 1);
+    homeGlow.style.opacity = String(er);
+    setPose(homeGlow, glowC, { s: 0.92 + 0.08 * er });
+    homeGlow.classList.toggle("is-on", tr >= 1);
 
     // sparkles twinkle sequentially near the end
     const sw = TIMELINE.sparkles;
@@ -112,7 +112,7 @@
     setCaption(
       p < 0.03 ? "Scroll to install your panels ↓"
       : p < TIMELINE.panels.end ? "Installing your solar panels…"
-      : p < TIMELINE.sunRays.start ? "Adding your air source heat pump…"
+      : p < TIMELINE.homeGlow.start ? "Adding your air source heat pump…"
       : "Install complete — ready to start saving ✓"
     );
   }
@@ -163,7 +163,7 @@
   }
 
   function resetSceneToFinished() {
-    [...panels, heatPump, sunRays, ...sparkles].forEach((el) => {
+    [...panels, heatPump, homeGlow, ...sparkles].forEach((el) => {
       el.style.opacity = "";
       el.removeAttribute("transform");
       el.classList.remove("is-set", "is-on");

@@ -24,7 +24,7 @@
   --shadow-lg: 0 16px 40px rgb(30 42 54 / 0.14);
   --font: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
   --header-h: 64px;
-  --maxw: 1120px;
+  --maxw: 1200px;
 }
 
 /* 2. base */
@@ -182,14 +182,15 @@ img, svg { max-width: 100%; }
   white-space: nowrap;
 }
 
-/* each chapter fills roughly a viewport so reading pace ≈ animation pace */
+/* chapters are sized by their content with generous—but not endless—
+   breathing room, so big monitors don't scroll through empty space */
 .story__panel {
-  min-height: calc(100svh - var(--header-h));
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-block: clamp(48px, 7vh, 80px);
+  padding-block: clamp(48px, 9vh, 104px);
 }
+.story__panel--hero { min-height: min(78svh, 680px); }
 /* gentle rise+fade the first time a chapter scrolls into view */
 .motion-ok .story__panel {
   opacity: 0;
@@ -207,7 +208,7 @@ img, svg { max-width: 100%; }
   padding: clamp(24px, 4vw, 40px);
   box-shadow: var(--shadow-lg);
   min-height: 0;
-  margin-block: 10vh;
+  margin-block: 40px 72px;
 }
 .story__panel--finance h2 { color: #fff; }
 .story__panel--finance .ticks li::before { background: var(--sun-400); }
@@ -234,9 +235,10 @@ img, svg { max-width: 100%; }
   .story__scenecol { display: contents; }
   /* mini scene pinned at the top; content scrolls beneath it */
   .story__scene {
-    height: 36svh;
-    padding-bottom: 10px;
-    background: linear-gradient(var(--sky-50) 0%, var(--sky-50) 86%, rgb(240 247 255 / 0) 100%);
+    height: 30svh;
+    padding-bottom: 8px;
+    background: var(--sky-50);
+    box-shadow: 0 14px 18px -14px rgb(30 42 54 / 0.25);
   }
   #houseScene {
     width: auto;
@@ -247,7 +249,8 @@ img, svg { max-width: 100%; }
     filter: drop-shadow(0 8px 16px rgb(30 42 54 / 0.12));
   }
   .scene-caption { display: none; }
-  .story__panel { min-height: 0; padding-block: 34px; justify-content: flex-start; }
+  .story__panel { min-height: 0; padding-block: 28px; justify-content: flex-start; }
+  .story__panel--hero { min-height: 0; }
   .story__panel--hero { text-align: center; }
   .story__panel--hero h1 { font-size: clamp(1.65rem, 7vw, 2.4rem); }
   .story__panel--hero .eyebrow { display: none; }
@@ -257,13 +260,13 @@ img, svg { max-width: 100%; }
   .hero__points { display: none; }
   .story__panel--finance { margin-block: 24px; }
   /* anchor jumps must clear the pinned mini scene */
-  html { scroll-padding-top: calc(var(--header-h) + 37svh); }
+  html { scroll-padding-top: calc(var(--header-h) + 31svh); }
 }
 
 /* --- scene animation states --- */
 #houseScene .panel,
 #heatPump,
-#sunRays,
+#homeGlow,
 .sparkle,
 .cloud {
   transform-box: fill-box;
@@ -274,7 +277,7 @@ img, svg { max-width: 100%; }
    JS adds .motion-ok on <html> and drives inline transform/opacity. */
 .motion-ok #houseScene .panel,
 .motion-ok #heatPump,
-.motion-ok #sunRays,
+.motion-ok #homeGlow,
 .motion-ok .sparkle { opacity: 0; }
 
 /* one-shot settle flash when a panel lands (whole element — <use> shadow
@@ -291,10 +294,10 @@ img, svg { max-width: 100%; }
 @keyframes fanSpin { to { transform: rotate(360deg); } }
 
 /* sun rays pulse gently once revealed */
-.motion-ok #sunRays.is-on { animation: rayPulse 2.4s ease-in-out infinite; }
-@keyframes rayPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
+.motion-ok #homeGlow.is-on { animation: glowPulse 3s ease-in-out infinite; }
+@keyframes glowPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.82; }
 }
 
 /* clouds drift slowly (decorative) */
@@ -511,4 +514,4 @@ img, svg { max-width: 100%; }
 .no-motion .scene-caption { display: none; }
 .no-motion .cloud,
 .no-motion #fanBlades,
-.no-motion #sunRays { animation: none !important; }
+.no-motion #homeGlow { animation: none !important; }

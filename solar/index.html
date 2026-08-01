@@ -44,168 +44,103 @@
 
         <div class="story__scenecol">
           <div class="story__scene">
-            <svg id="houseScene" viewBox="0 0 720 620" role="img"
-                 aria-label="Illustration of a UK brick house having solar panels and an air source heat pump installed">
+            <svg id="houseScene" viewBox="0 0 760 560" role="img"
+                 aria-label="Aerial illustration of a modern L-shaped UK home having solar panels and an air source heat pump installed">
               <defs>
-                <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#dceeff"/>
-                  <stop offset="1" stop-color="#f2f9ff"/>
-                </linearGradient>
                 <linearGradient id="panelGrad" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0" stop-color="#22406b"/>
                   <stop offset="1" stop-color="#101f3a"/>
                 </linearGradient>
-                <radialGradient id="sunGlow" cx=".5" cy=".5" r=".5">
-                  <stop offset="0" stop-color="#ffd76a" stop-opacity=".9"/>
+                <radialGradient id="glowGrad" cx=".5" cy=".5" r=".5">
+                  <stop offset="0" stop-color="#ffd76a" stop-opacity=".38"/>
                   <stop offset="1" stop-color="#ffd76a" stop-opacity="0"/>
                 </radialGradient>
-                <!-- one realistic panel, instanced 8 times below: silver frame,
-                     dark cell field, 6x3 cell grid, small glare -->
-                <g id="panelDef">
-                  <rect x="0" y="0" width="94" height="58" rx="3" fill="#cfd8e3"/>
-                  <rect x="3" y="3" width="88" height="52" rx="2" fill="url(#panelGrad)"/>
-                  <path d="M17.7 3v52M32.3 3v52M47 3v52M61.7 3v52M76.3 3v52M3 20.3h88M3 37.7h88" stroke="#3b5f92" stroke-width="1"/>
-                  <path d="M9 9l12 7" stroke="#9dc4ef" stroke-width="2.5" stroke-linecap="round"/>
-                </g>
+                <g id="panelDef"><path d="M0 0l73.6 36.8l34.7 -34.0l-73.6 -36.8z" fill="#c9d2dd"/><path d="M9.7 0.2l60.4 30.2l28.4 -27.9l-60.4 -30.2z" fill="url(#panelGrad)"/><path d="M24.8 7.8l28.4 -27.9" stroke="#3b5f92" stroke-width="1.2"/><path d="M39.9 15.3l28.4 -27.9" stroke="#3b5f92" stroke-width="1.2"/><path d="M55.0 22.9l28.4 -27.9" stroke="#3b5f92" stroke-width="1.2"/><path d="M24.0 -13.7l60.4 30.2" stroke="#3b5f92" stroke-width="1.2"/><path d="M15.7 0.2l10 5" stroke="#9dc4ef" stroke-width="2.2" stroke-linecap="round"/></g>
+                <clipPath id="sceneClip"><rect x="0" y="0" width="760" height="560" rx="24"/></clipPath>
               </defs>
-
-              <!-- sky -->
-              <rect x="0" y="0" width="720" height="560" rx="24" fill="url(#skyGrad)"/>
-
-              <!-- clouds -->
-              <g class="cloud cloud--1" fill="#ffffff" opacity=".9">
-                <ellipse cx="170" cy="120" rx="44" ry="18"/>
-                <ellipse cx="206" cy="110" rx="30" ry="15"/>
-                <ellipse cx="140" cy="112" rx="26" ry="13"/>
-              </g>
-              <g class="cloud cloud--2" fill="#ffffff" opacity=".75">
-                <ellipse cx="560" cy="70" rx="38" ry="16"/>
-                <ellipse cx="592" cy="62" rx="25" ry="12"/>
-                <ellipse cx="532" cy="62" rx="22" ry="11"/>
-              </g>
-
-              <!-- sun -->
-              <g id="sun">
-                <circle cx="96" cy="96" r="68" fill="url(#sunGlow)"/>
-                <circle cx="96" cy="96" r="32" fill="#ffc93c"/>
-                <g id="sunRays" stroke="#ffc93c" stroke-width="6" stroke-linecap="round">
-                  <path d="M96 50V32"/>
-                  <path d="M96 142v18"/>
-                  <path d="M50 96H32"/>
-                  <path d="M142 96h18"/>
-                  <path d="M64 64L51 51"/>
-                  <path d="M128 128l13 13"/>
-                  <path d="M128 64l13-13"/>
-                  <path d="M64 128l-13 13"/>
-                </g>
-              </g>
-
-              <!-- ground -->
-              <rect x="0" y="548" width="720" height="72" rx="24" fill="#bfe3c0"/>
-              <rect x="0" y="548" width="720" height="10" fill="#a9d6ab"/>
-
-              <g id="house">
-                <!-- facade -->
-                <rect x="120" y="330" width="480" height="225" fill="#c96f4a"/>
-                <!-- brick texture -->
-                <g stroke="#b55e3b" stroke-width="2" opacity=".5">
-                  <path d="M120 360h480M120 390h480M120 420h480M120 450h480M120 480h480M120 510h480M120 540h480"/>
-                  <path d="M170 330v30M250 330v30M420 330v30M540 330v30M140 360v30M310 360v30M580 360v30M240 420v30M460 420v30M135 480v30M585 480v30M300 510v30M255 540v15M540 540v15"/>
-                </g>
-
-                <!-- roof (trapezoid, front-on) -->
-                <polygon points="90,330 160,180 560,180 630,330" fill="#3d4a57"/>
-                <rect x="84" y="326" width="552" height="10" rx="5" fill="#2e3944"/>
-
-                <!-- chimney -->
-                <g id="chimney">
-                  <rect x="470" y="110" width="46" height="80" fill="#b55e3b"/>
-                  <rect x="462" y="100" width="62" height="14" rx="4" fill="#9c4f31"/>
-                  <rect x="480" y="80" width="10" height="20" rx="3" fill="#77808a"/>
-                  <rect x="502" y="80" width="10" height="20" rx="3" fill="#77808a"/>
-                </g>
-
-                <!-- first-floor windows -->
-                <g class="window">
-                  <rect x="150" y="352" width="76" height="62" rx="4" fill="#ffffff"/>
-                  <rect x="156" y="358" width="64" height="50" rx="2" fill="#bfe0f5"/>
-                  <path d="M188 358v50M156 383h64" stroke="#ffffff" stroke-width="4"/>
-                </g>
-                <g class="window">
-                  <rect x="322" y="352" width="76" height="62" rx="4" fill="#ffffff"/>
-                  <rect x="328" y="358" width="64" height="50" rx="2" fill="#bfe0f5"/>
-                  <path d="M360 358v50M328 383h64" stroke="#ffffff" stroke-width="4"/>
-                </g>
-                <g class="window">
-                  <rect x="494" y="352" width="76" height="62" rx="4" fill="#ffffff"/>
-                  <rect x="500" y="358" width="64" height="50" rx="2" fill="#bfe0f5"/>
-                  <path d="M532 358v50M500 383h64" stroke="#ffffff" stroke-width="4"/>
-                </g>
-
-                <!-- ground-floor windows -->
-                <g class="window">
-                  <rect x="150" y="456" width="84" height="72" rx="4" fill="#ffffff"/>
-                  <rect x="156" y="462" width="72" height="60" rx="2" fill="#bfe0f5"/>
-                  <path d="M192 462v60M156 492h72" stroke="#ffffff" stroke-width="4"/>
-                </g>
-                <g class="window">
-                  <rect x="494" y="456" width="84" height="72" rx="4" fill="#ffffff"/>
-                  <rect x="500" y="462" width="72" height="60" rx="2" fill="#bfe0f5"/>
-                  <path d="M536 462v60M500 492h72" stroke="#ffffff" stroke-width="4"/>
-                </g>
-
-                <!-- door -->
-                <g id="door">
-                  <path d="M328 555v-83c0-17.7 14.3-32 32-32s32 14.3 32 32v83z" fill="#1b5e9e"/>
-                  <path d="M334 555v-77c0-14.4 11.6-26 26-26s26 11.6 26 26v77z" fill="#2f86d6"/>
-                  <circle cx="378" cy="505" r="4" fill="#ffd76a"/>
-                  <rect x="322" y="553" width="76" height="9" rx="3" fill="#8a949e"/>
-                </g>
-
-                <!-- bushes -->
-                <g fill="#2e9e5b">
-                  <ellipse cx="100" cy="548" rx="28" ry="20"/>
-                  <ellipse cx="130" cy="552" rx="19" ry="13" fill="#37b56b"/>
-                  <ellipse cx="585" cy="552" rx="17" ry="12"/>
-                </g>
-              </g>
-
-              <!-- solar panels: 2 rows x 4, authored in FINAL position; JS offsets them.
-                   Install order = DOM order: bottom row L->R, then top row. -->
-              <g id="panels">
-                <use class="panel" href="#panelDef" x="160" y="262"/>
-                <use class="panel" href="#panelDef" x="262" y="262"/>
-                <use class="panel" href="#panelDef" x="364" y="262"/>
-                <use class="panel" href="#panelDef" x="466" y="262"/>
-                <use class="panel" href="#panelDef" x="160" y="196"/>
-                <use class="panel" href="#panelDef" x="262" y="196"/>
-                <use class="panel" href="#panelDef" x="364" y="196"/>
-                <use class="panel" href="#panelDef" x="466" y="196"/>
-              </g>
-
-              <!-- air source heat pump -->
+              <g clip-path="url(#sceneClip)">
+              <rect x="0" y="0" width="760" height="560" rx="24" fill="#b9d7a5"/>
+<ellipse cx="150" cy="470" rx="150" ry="60" fill="#c6e0b3" opacity=".7"/>
+<ellipse cx="640" cy="150" rx="130" ry="70" fill="#c6e0b3" opacity=".55"/>
+<ellipse cx="90" cy="120" rx="90" ry="55" fill="#c6e0b3" opacity=".4"/>
+<polygon points="501.6,451.4 730.4,565.8 621.6,620.2 392.8,505.8" fill="#d6dad4" stroke="#c2c8bf" stroke-width="3"/>
+<polygon points="325.6,353.8 360.8,371.4 277.6,413.0 242.4,395.4" fill="#d6dad4" stroke="#c2c8bf" stroke-width="2.5"/>
+<ellipse cx="360" cy="342" rx="235" ry="88" fill="#1f2a22" opacity=".13"/>
+<g id="house">
+<polygon points="180.0,193.0 500.0,353.0 500.0,441.0 180.0,281.0" fill="#f7f4ee"/>
+<polygon points="500.0,353.0 660.0,273.0 660.0,361.0 500.0,441.0" fill="#e2dcd1"/>
+<polygon points="202.4,214.2 240.8,233.4 240.8,257.4 202.4,238.2" fill="#cfe2ee"/><polygon points="202.4,214.2 240.8,233.4 240.8,257.4 202.4,238.2" fill="none" stroke="#39424b" stroke-width="2.5"/><path d="M221.6 223.8L221.6 247.8" stroke="#39424b" stroke-width="1.6"/>
+<polygon points="276.0,251.0 314.4,270.2 314.4,294.2 276.0,275.0" fill="#cfe2ee"/><polygon points="276.0,251.0 314.4,270.2 314.4,294.2 276.0,275.0" fill="none" stroke="#39424b" stroke-width="2.5"/><path d="M295.2 260.6L295.2 284.6" stroke="#39424b" stroke-width="1.6"/>
+<polygon points="349.6,287.8 388.0,307.0 388.0,331.0 349.6,311.8" fill="#cfe2ee"/><polygon points="349.6,287.8 388.0,307.0 388.0,331.0 349.6,311.8" fill="none" stroke="#39424b" stroke-width="2.5"/><path d="M368.8 297.4L368.8 321.4" stroke="#39424b" stroke-width="1.6"/>
+<polygon points="205.6,255.8 253.6,279.8 253.6,303.8 205.6,279.8" fill="#cfe2ee"/><polygon points="205.6,255.8 253.6,279.8 253.6,303.8 205.6,279.8" fill="none" stroke="#39424b" stroke-width="2.5"/><path d="M229.6 267.8L229.6 291.8" stroke="#39424b" stroke-width="1.6"/>
+<polygon points="272.8,289.4 311.2,308.6 311.2,332.6 272.8,313.4" fill="#cfe2ee"/><polygon points="272.8,289.4 311.2,308.6 311.2,332.6 272.8,313.4" fill="none" stroke="#39424b" stroke-width="2.5"/><path d="M292.0 299.0L292.0 323.0" stroke="#39424b" stroke-width="1.6"/>
+<polygon points="327.2,310.6 359.2,326.6 359.2,370.6 327.2,354.6" fill="#405564"/>
+<polygon points="327.2,310.6 359.2,326.6 359.2,370.6 327.2,354.6" fill="none" stroke="#262e35" stroke-width="2"/>
+<circle cx="352.2" cy="346.1" r="2.6" fill="#ffd76a"/>
+<polygon points="631.2,297.4 592.8,316.6 592.8,340.6 631.2,321.4" fill="#cfe2ee"/><polygon points="631.2,297.4 592.8,316.6 592.8,340.6 631.2,321.4" fill="none" stroke="#39424b" stroke-width="2.5"/><path d="M612.0 307.0L612.0 331.0" stroke="#39424b" stroke-width="1.6"/>
+<polygon points="567.2,329.4 528.8,348.6 528.8,372.6 567.2,353.4" fill="#cfe2ee"/><polygon points="567.2,329.4 528.8,348.6 528.8,372.6 567.2,353.4" fill="none" stroke="#39424b" stroke-width="2.5"/><path d="M548.0 339.0L548.0 363.0" stroke="#39424b" stroke-width="1.6"/>
+<polygon points="631.2,337.4 586.4,359.8 586.4,383.8 631.2,361.4" fill="#cfe2ee"/><polygon points="631.2,337.4 586.4,359.8 586.4,383.8 631.2,361.4" fill="none" stroke="#39424b" stroke-width="2.5"/><path d="M608.8 348.6L608.8 372.6" stroke="#39424b" stroke-width="1.6"/>
+<polygon points="340.0,101.8 682.4,273.0 591.2,274.6 248.8,103.4" fill="#353e47"/>
+<polygon points="157.6,193.0 500.0,364.2 591.2,274.6 248.8,103.4" fill="#4a545e"/>
+<path d="M248.8 103.4L591.2 274.6" stroke="#262e35" stroke-width="5" stroke-linecap="round"/>
+<polygon points="276.0,405.0 404.0,341.0 404.0,393.0 276.0,457.0" fill="#f7f4ee"/>
+<polygon points="276.0,405.0 372.0,453.0 372.0,505.0 276.0,457.0" fill="#f7f4ee"/>
+<polygon points="276.0,405.0 324.0,397.0 372.0,453.0" fill="#f7f4ee"/>
+<polygon points="372.0,453.0 500.0,389.0 500.0,441.0 372.0,505.0" fill="#e2dcd1"/>
+<polygon points="480.8,409.6 391.2,454.4 391.2,495.4 480.8,450.6" fill="#d9d3c8"/>
+<polygon points="480.8,409.6 391.2,454.4 391.2,495.4 480.8,450.6" fill="none" stroke="#b8b1a4" stroke-width="2.5"/>
+<path d="M480.8 440.4L391.2 485.1" stroke="#b8b1a4" stroke-width="1.6"/>
+<path d="M480.8 430.1L391.2 474.9" stroke="#b8b1a4" stroke-width="1.6"/>
+<path d="M480.8 419.9L391.2 464.6" stroke="#b8b1a4" stroke-width="1.6"/>
+<polygon points="298.4,428.2 349.6,453.8 349.6,477.8 298.4,452.2" fill="#cfe2ee"/><polygon points="298.4,428.2 349.6,453.8 349.6,477.8 298.4,452.2" fill="none" stroke="#39424b" stroke-width="2.5"/><path d="M324.0 441.0L324.0 465.0" stroke="#39424b" stroke-width="1.6"/>
+<polygon points="392.8,337.4 253.6,407.0 312.8,402.6 452.0,333.0" fill="#4a545e"/>
+<polygon points="511.2,396.6 372.0,466.2 312.8,402.6 452.0,333.0" fill="#353e47"/>
+<path d="M452.0 333.0L312.8 402.6" stroke="#262e35" stroke-width="4.5" stroke-linecap="round"/>
+</g>
+<g id="greenery">
+<ellipse cx="96" cy="328" rx="30" ry="13.5" fill="#1f2a22" opacity=".12"/>
+<circle cx="90" cy="320" r="30" fill="#7fb069"/>
+<circle cx="81.6" cy="311.0" r="16.5" fill="#93c07d"/>
+<ellipse cx="636" cy="98" rx="34" ry="15.3" fill="#1f2a22" opacity=".12"/>
+<circle cx="630" cy="90" r="34" fill="#7fb069"/>
+<circle cx="620.48" cy="79.8" r="18.700000000000003" fill="#93c07d"/>
+<ellipse cx="706" cy="308" rx="26" ry="11.700000000000001" fill="#1f2a22" opacity=".12"/>
+<circle cx="700" cy="300" r="26" fill="#7fb069"/>
+<circle cx="692.72" cy="292.2" r="14.3" fill="#93c07d"/>
+<ellipse cx="66" cy="218" rx="24" ry="10.8" fill="#1f2a22" opacity=".12"/>
+<circle cx="60" cy="210" r="24" fill="#7fb069"/>
+<circle cx="53.28" cy="202.8" r="13.200000000000001" fill="#93c07d"/>
+<ellipse cx="247" cy="356" rx="17" ry="11" fill="#6d9e59"/>
+<ellipse cx="356" cy="404" rx="14" ry="9" fill="#6d9e59"/>
+</g>
+              <g id="homeGlow"><ellipse cx="360" cy="255" rx="255" ry="130" fill="url(#glowGrad)"/><polygon points="202.4,214.2 240.8,233.4 240.8,257.4 202.4,238.2" fill="#ffd76a" opacity=".9"/><polygon points="276.0,251.0 314.4,270.2 314.4,294.2 276.0,275.0" fill="#ffd76a" opacity=".9"/><polygon points="349.6,287.8 388.0,307.0 388.0,331.0 349.6,311.8" fill="#ffd76a" opacity=".9"/><polygon points="205.6,255.8 253.6,279.8 253.6,303.8 205.6,279.8" fill="#ffd76a" opacity=".9"/><polygon points="272.8,289.4 311.2,308.6 311.2,332.6 272.8,313.4" fill="#ffd76a" opacity=".9"/><polygon points="631.2,297.4 592.8,316.6 592.8,340.6 631.2,321.4" fill="#ffd76a" opacity=".9"/><polygon points="567.2,329.4 528.8,348.6 528.8,372.6 567.2,353.4" fill="#ffd76a" opacity=".9"/><polygon points="631.2,337.4 586.4,359.8 586.4,383.8 631.2,361.4" fill="#ffd76a" opacity=".9"/><polygon points="298.4,428.2 349.6,453.8 349.6,477.8 298.4,452.2" fill="#ffd76a" opacity=".9"/></g>
+              <g id="panels"><use class="panel" href="#panelDef" x="201.0" y="193.1"/><use class="panel" href="#panelDef" x="278.4" y="231.8"/><use class="panel" href="#panelDef" x="355.9" y="270.5"/><use class="panel" href="#panelDef" x="433.3" y="309.2"/><use class="panel" href="#panelDef" x="238.4" y="156.3"/><use class="panel" href="#panelDef" x="315.8" y="195.0"/><use class="panel" href="#panelDef" x="393.3" y="233.8"/><use class="panel" href="#panelDef" x="470.7" y="272.5"/></g>
               <g id="heatPump">
-                <rect x="612" y="486" width="92" height="62" rx="8" fill="#dfe6ec" stroke="#9aa7b2" stroke-width="2.5"/>
-                <circle cx="646" cy="517" r="20" fill="#c6d2db" stroke="#9aa7b2" stroke-width="2.5"/>
-                <g id="fanBlades" fill="#77808a">
-                  <path d="M646 517l-3-15c1-3 5-3 6 0z"/>
-                  <path d="M646 517l14.2 5.5c1.7 2.9-1.5 5.9-4.2 4.6z"/>
-                  <path d="M646 517l-11 10c-3.3.2-4.6-4-2.1-5.9z"/>
-                  <circle cx="646" cy="517" r="4.5"/>
-                </g>
-                <path d="M682 497h16M682 507h16M682 517h16M682 527h16" stroke="#9aa7b2" stroke-width="3" stroke-linecap="round"/>
-                <path d="M612 531h-14" stroke="#9aa7b2" stroke-width="5" stroke-linecap="round"/>
-                <rect x="618" y="548" width="10" height="8" fill="#9aa7b2"/>
-                <rect x="688" y="548" width="10" height="8" fill="#9aa7b2"/>
-              </g>
-
-              <!-- sparkles -->
+  <ellipse cx="612" cy="443" rx="34" ry="10" fill="#1f2a22" opacity=".15"/>
+  <rect x="580" y="391" width="62" height="50" rx="7" fill="#e8ecef" stroke="#9aa7b2" stroke-width="2.5"/>
+  <circle cx="602" cy="416" r="15" fill="#cbd5dd" stroke="#9aa7b2" stroke-width="2.2"/>
+  <g id="fanBlades" fill="#77808a">
+    <path d="M602 416l-2.4-11.5c.8-2.4 4-2.4 4.8 0z"/>
+    <path d="M602 416l10.8 4.2c1.3 2.2-1.2 4.5-3.2 3.5z"/>
+    <path d="M602 416l-8.4 7.6c-2.5.2-3.5-3-1.6-4.5z"/>
+    <circle cx="602" cy="416" r="3.4"/>
+  </g>
+  <path d="M624 401h10M624 409h10M624 417h10" stroke="#9aa7b2" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M580 421l-16-8" stroke="#9aa7b2" stroke-width="4.5" stroke-linecap="round"/>
+</g>
               <g id="sparkles" fill="#ffc93c">
-                <path class="sparkle" d="M198 104l4 10 10 4-10 4-4 10-4-10-10-4 10-4z"/>
-                <path class="sparkle" d="M614 130l3.5 8.5 8.5 3.5-8.5 3.5-3.5 8.5-3.5-8.5-8.5-3.5 8.5-3.5z"/>
-                <path class="sparkle" d="M56 264l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
-                <path class="sparkle" d="M666 434l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
-                <path class="sparkle" d="M352 76l3.5 8.5 8.5 3.5-8.5 3.5-3.5 8.5-3.5-8.5-8.5-3.5 8.5-3.5z"/>
+  <path class="sparkle" d="M120 96l4 10 10 4-10 4-4 10-4-10-10-4 10-4z"/>
+  <path class="sparkle" d="M636 372l3.5 8.5 8.5 3.5-8.5 3.5-3.5 8.5-3.5-8.5-8.5-3.5 8.5-3.5z"/>
+  <path class="sparkle" d="M78 420l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
+  <path class="sparkle" d="M700 210l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>
+  <path class="sparkle" d="M420 60l3.5 8.5 8.5 3.5-8.5 3.5-3.5 8.5-3.5-8.5-8.5-3.5 8.5-3.5z"/>
+</g>
+              <g class="cloud cloud--1" fill="#ffffff" opacity=".85">
+  <ellipse cx="170" cy="52" rx="40" ry="15"/><ellipse cx="202" cy="44" rx="26" ry="12"/><ellipse cx="144" cy="45" rx="22" ry="10"/>
+</g>
+<g class="cloud cloud--2" fill="#ffffff" opacity=".7">
+  <ellipse cx="600" cy="66" rx="34" ry="13"/><ellipse cx="628" cy="59" rx="22" ry="10"/><ellipse cx="576" cy="59" rx="19" ry="9"/>
+</g>
               </g>
             </svg>
             <p class="scene-caption" id="sceneCaption" aria-hidden="true">Scroll to install your panels&nbsp;↓</p>
