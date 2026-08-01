@@ -164,6 +164,7 @@ img, svg { max-width: 100%; }
   height: auto;
   max-height: calc(100svh - var(--header-h) - 40px);
   filter: drop-shadow(0 14px 28px rgb(30 42 54 / 0.12));
+  overflow: hidden; /* WebKit can let transformed SVG children escape the clip */
 }
 .scene-caption {
   position: absolute;
@@ -188,6 +189,16 @@ img, svg { max-width: 100%; }
   flex-direction: column;
   justify-content: center;
   padding-block: clamp(48px, 7vh, 80px);
+}
+/* gentle rise+fade the first time a chapter scrolls into view */
+.motion-ok .story__panel {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.motion-ok .story__panel.in-view {
+  opacity: 1;
+  transform: none;
 }
 .story__panel--finance {
   background: linear-gradient(135deg, var(--sky-700), var(--sky-500));

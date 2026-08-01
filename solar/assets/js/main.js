@@ -40,36 +40,63 @@
 
   const local = (p, start, end) => clamp((p - start) / (end - start), 0, 1);
 
+  /* All scene motion uses the SVG `transform` ATTRIBUTE in viewBox units.
+     CSS-pixel transforms on SVG children behave differently on iOS Safari
+     (wrong units + they can escape the SVG's clip); attribute transforms
+     are identical everywhere. Scale/rotate are composed about each
+     element's own centre. */
+  const centreOf = (el) => {
+    const b = el.getBBox();
+    return { cx: b.x + b.width / 2, cy: b.y + b.height / 2 };
+  };
+  const panelC = panels.map(centreOf);
+  const sparkleC = sparkles.map(centreOf);
+  const raysC = sunRays ? centreOf(sunRays) : { cx: 0, cy: 0 };
+
+  function setPose(el, c, { dx = 0, dy = 0, s = 1, rot = 0 }) {
+    el.setAttribute(
+      "transform",
+      `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) translate(${c.cx} ${c.cy}) rotate(${rot.toFixed(2)}) scale(${s.toFixed(4)}) translate(${-c.cx} ${-c.cy})`
+    );
+  }
+
   function applyScene(p) {
-    // panels: long-overlap staggered glide-in, bottom row first
+    // panels: staggered drop into place — they materialise close to the
+    // roof (opacity gated) so a mid-scroll freeze never shows stray
+    // panels floating in the sky
     const { start, end } = TIMELINE.panels;
     const slot = (end - start) / panels.length;
     panels.forEach((panel, i) => {
-      const t = clamp((p - (start + i * slot * 0.65)) / (slot * 2.8), 0, 1);
+      const t = clamp((p - (start + i * slot * 0.85)) / (slot * 2.2), 0, 1);
       if (t <= 0) {
         panel.style.opacity = "0";
-        panel.style.transform = "translateY(-110px) scale(0.75)";
+        setPose(panel, panelC[i], { dy: -48, s: 0.92 });
         panel.classList.remove("is-set");
         return;
       }
       const e = easeOutBack(t);
-      panel.style.opacity = String(clamp(t * 3, 0, 1));
-      panel.style.transform = `translateY(${(-110 * (1 - e)).toFixed(1)}px) scale(${(0.75 + 0.25 * e).toFixed(3)})`;
+      panel.style.opacity = String(clamp(t / 0.5, 0, 1));
+      setPose(panel, panelC[i], {
+        dy: -48 * (1 - e),
+        s: 0.92 + 0.08 * e,
+        rot: -4 * (1 - e),
+      });
       panel.classList.toggle("is-set", t >= 1);
     });
 
-    // heat pump slides in from the right
+    // heat pump slides in from the right (80 viewBox units keeps it
+    // inside the scene even mid-flight)
     const tp = local(p, TIMELINE.heatPump.start, TIMELINE.heatPump.end);
     const ep = easeOutCubic(tp);
-    heatPump.style.opacity = String(clamp(tp * 3, 0, 1));
-    heatPump.style.transform = `translateX(${(140 * (1 - ep)).toFixed(1)}px)`;
+    heatPump.style.opacity = String(clamp(tp / 0.4, 0, 1));
+    heatPump.setAttribute("transform", `translate(${(80 * (1 - ep)).toFixed(2)} 0)`);
     heatPump.classList.toggle("is-on", tp >= 1);
 
     // sun rays grow in, then pulse via CSS
     const tr = local(p, TIMELINE.sunRays.start, TIMELINE.sunRays.end);
     const er = easeOutCubic(tr);
     sunRays.style.opacity = String(er);
-    sunRays.style.transform = `scale(${(0.5 + 0.5 * er).toFixed(3)})`;
+    setPose(sunRays, raysC, { s: 0.5 + 0.5 * er });
     sunRays.classList.toggle("is-on", tr >= 1);
 
     // sparkles twinkle sequentially near the end
@@ -79,7 +106,7 @@
       const t = clamp((p - (sw.start + i * sSlot * 0.7)) / (sSlot * 1.6), 0, 1);
       const wave = Math.sin(Math.PI * t); // 0 → 1 → 0
       sp.style.opacity = String(wave);
-      sp.style.transform = `scale(${(0.4 + 0.8 * wave).toFixed(3)})`;
+      setPose(sp, sparkleC[i], { s: 0.4 + 0.8 * wave });
     });
 
     setCaption(
@@ -138,7 +165,7 @@
   function resetSceneToFinished() {
     [...panels, heatPump, sunRays, ...sparkles].forEach((el) => {
       el.style.opacity = "";
-      el.style.transform = "";
+      el.removeAttribute("transform");
       el.classList.remove("is-set", "is-on");
     });
   }
@@ -163,6 +190,25 @@
     motionQuery.addEventListener("change", applyMotionPref);
     window.addEventListener("scroll", () => { if (!motionQuery.matches) kick(); }, { passive: true });
     window.addEventListener("resize", () => { if (!motionQuery.matches) kick(); });
+  }
+
+  /* ---------- chapter reveal: gentle rise+fade on first entry ---------- */
+  const chapters = Array.from(document.querySelectorAll(".story__panel"));
+  if (chapters.length) {
+    if ("IntersectionObserver" in window && !motionQuery.matches) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in-view");
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      chapters.forEach((c) => io.observe(c));
+      chapters[0].classList.add("in-view"); // hero shows instantly
+    } else {
+      chapters.forEach((c) => c.classList.add("in-view"));
+    }
   }
 
   /* ---------- quote form ---------- */
