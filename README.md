@@ -1,99 +1,48 @@
-# bes@portfolio — Terminal Portfolio
+# bes — portfolio site (Ledger direction)
 
-A hand-coded personal site styled as a **dev terminal / console** — boot
-sequence, typed hero, projects shown as a live `process list` you "inspect",
-and a `neofetch`-style about block. No frameworks, no build step — just HTML,
-CSS and vanilla JS, so the interaction craft *is* the portfolio.
+Static build. No framework, no build step.
 
-## What's inside
+## Contents
 
-- **Boot sequence** on first visit (once per session), then a **typed terminal hero**.
-- **Projects as a process list** — each row is a "running" process; click/Enter to `inspect` it (opens a terminal-window modal with a live preview).
-- **`neofetch`-style about block** with ASCII art + system-info rows.
-- **Block cursor**, scanline + grid screen FX, phosphor-green palette, animated counters, a status ticker, and a scroll-progress bar.
-- **Live project previews** — auto-screenshots live URLs (with fallbacks) or uses an uploaded image.
-- Fully **responsive** (hamburger menu, bottom-sheet modals) and respects `prefers-reduced-motion` and touch devices.
-
-## Showcased work
-
-| Automations & builds | Personal projects |
-|---|---|
-| Birria Birria — ordering & ops | Movie / Series Picker |
-| Blood Testing Panel — health data | Birthday Surprise |
-| Adobe Email Automations | |
-| Trading Tool | |
-
-## Editing content
-
-Each project is a `.proc__row` in `index.html`, driven by `data-*` attributes:
-
-```html
-<article class="proc__row" tabindex="0" role="button"
-  data-name="birria-birria"                 <!-- process name shown in the list -->
-  data-title="Birria Birria"                <!-- heading in the inspect modal -->
-  data-tag="hospitality · ops"              <!-- TYPE column -->
-  data-glyph="🌮"                            <!-- icon for the placeholder preview -->
-  data-link="https://your-live-url.com"     <!-- live URL ("#" = none) -->
-  data-color="#ff7a59"
-  data-summary="One-line hook shown in the modal."
-  data-details="Paragraph one.|Stack: ...|Impact: ...">  <!-- split paragraphs with | -->
-  ...visible row cells...
-</article>
 ```
-
-- **`data-link`** — the live site URL. (Birria Birria → `https://birria-birria.pages.dev/`, moving to `birriabirria.com` later.)
-- **`data-details`** — paragraphs separated by `|`; a leading `Word:` gets bolded automatically.
-- **`data-shot`** *(optional)* — path/URL to a screenshot image shown in the inspect modal, e.g. `data-shot="assets/screenshots/TradingBot.png"`. If omitted but `data-link` is a real URL, a live screenshot is generated automatically (free service, with fallbacks). If neither exists, a branded placeholder is shown. Drop images in `assets/screenshots/`.
-- **`data-noshot="true"`** — hide the preview frame entirely for that project.
-
-### Showing / hiding live links
-
-All "Visit live site" buttons are **hidden globally** right now via a master
-switch at the top of `assets/js/main.js`:
-
-```js
-const SHOW_LIVE_LINKS = false; // flip to true to reveal live links
-```
-
-When you flip it to `true`, every card that has a real `data-link` (not `#`)
-will show its button automatically — so URLs can be stored ahead of time and
-revealed all at once.
-
-Update your email anywhere it appears (`mailto:` links) and the name/brand text in the nav and hero.
-
-## Run locally
-
-```bash
-# any static server works
-python3 -m http.server 8000
-# then open http://localhost:8000
+index.html                  the whole site (self-contained)
+assets/screenshots/         project screenshots referenced at runtime
 ```
 
 ## Deploy
 
-It's static — drop the folder on GitHub Pages, Netlify, Vercel, or Cloudflare
-Pages. For GitHub Pages: push to the repo, enable Pages on the branch root.
+Drop this folder at the root of a branch and enable Pages, or point
+Netlify / Vercel / Cloudflare Pages at it. Nothing to compile.
 
-## Analytics (who's visiting)
+## Pushing to besdoth/personalbrand
 
-Uses **Cloudflare Web Analytics** — privacy-first, cookie-free (no consent
-banner needed), free. Two ways to turn it on:
+```bash
+# from a clone of the repo
+git checkout -b ledger-redesign
+cp -r build/* .            # or into a /new subfolder to keep the terminal site live
+git add index.html assets
+git commit -m "New portfolio direction: Ledger"
+git push -u origin ledger-redesign
+```
 
-1. **Automatic (recommended, zero code):** Cloudflare dashboard →
-   *Analytics & Logs → Web Analytics → Add a site* → enter `besiserver.co.uk`
-   → **Automatic setup** (works because the domain is proxied through
-   Cloudflare). Done — no code change.
-2. **In code:** grab your Web Analytics **token** (Manual setup in the same
-   place) and paste it into `CF_BEACON_TOKEN` in the analytics snippet at the
-   bottom of `index.html`. The beacon only loads when a token is present.
+Keep the old terminal site on the default branch until you are happy with this one.
 
-Use **one** of the two, not both (avoids double-counting). You'll see visits,
-page views, top pages, referrers, countries, and device/browser breakdowns.
+## Editing content
 
-## Mobile
+All project copy, stats and metadata live in one array (`data`) inside the
+inline script in `index.html` — search for `birria-birria`. Each entry holds:
 
-Built mobile-first: hamburger nav menu, content-height hero (`svh`, no iOS
-address-bar jump), bottom-sheet project modals, larger tap targets, and
-lightened background effects on phones for smoother scrolling. Interactions
-that need a pointer (custom cursor, 3D tilt, magnetic buttons) are disabled on
-touch devices automatically.
+- `title`, `category`, `short` — index row
+- `summary`, `problem`, `steps[]`, `impact` — case study body
+- `p1` / `p2` / `p3` — the three pipeline nodes
+- `role`, `stack`, `state`, `host`, `url` — meta table (`url` renders the live link)
+
+Screenshots are mapped by slug in the `shots` object. Birria Birria uses a live
+capture service (`image.thum.io`) — replace that URL with a local file in
+`assets/screenshots/` if you want it guaranteed offline.
+
+## Still to do
+
+- Mobile layouts
+- Portrait photo on the Profile screen
+- Screenshots for Birria Birria (local) and VertexBytes
