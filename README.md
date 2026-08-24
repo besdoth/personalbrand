@@ -27,6 +27,21 @@ git push -u origin ledger-redesign
 
 Keep the old terminal site on the default branch until you are happy with this one.
 
+## Mobile
+
+The exported design is a fixed 1280px artboard — no media queries, no
+`clamp()`, every size a hard px value. A mobile layer
+(`functions/_responsive.js`) is injected at the edge for screens **700px and
+under**, which is where the design measurably starts to break; tablets and
+desktop are left exactly as drawn.
+
+It collapses the desktop grids, rescales the display type, trims the
+desktop spacing and fits the nav. Like the tracker, it is injected rather
+than pasted into `index.html`, so it survives re-exporting the design.
+
+If you later add mobile variants in Claude Design itself, delete the
+`RESPONSIVE_CSS` import from `functions/_middleware.js` and this layer is gone.
+
 ## Analytics
 
 Visits and clicks are tracked into your own Cloudflare D1 database and shown at

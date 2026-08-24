@@ -120,7 +120,8 @@ npx wrangler d1 execute besi-analytics --remote --command \
 
 ```
 assets/js/track.js      the tracker — batches nothing, sends small JSON beacons
-functions/_middleware.js  injects that script into every HTML response
+functions/_responsive.js  the mobile layer for the exported design
+functions/_middleware.js  injects both into every HTML response
 functions/api/track.js  receives events, stamps geo from the edge, writes to D1
 functions/api/stats.js  password-gated aggregate queries for the dashboard
 functions/api/health.js unauthenticated wiring check
