@@ -27,6 +27,23 @@ git push -u origin ledger-redesign
 
 Keep the old terminal site on the default branch until you are happy with this one.
 
+## Analytics
+
+Visits and clicks are tracked into your own Cloudflare D1 database and shown at
+**`/stats`** (password-protected): where in the world people are, which links
+they click, where they go next, and which shared link brought them.
+
+Setup and how it works: **[ANALYTICS.md](ANALYTICS.md)**.
+
+```
+assets/js/track.js        tracker (injected automatically — survives redesigns)
+functions/                the /api/track, /api/stats and /api/health endpoints
+stats/index.html          the dashboard
+schema.sql                the D1 table
+```
+
+Health check after deploying: `https://besiserver.co.uk/api/health`.
+
 ## Editing content
 
 All project copy, stats and metadata live in one array (`data`) inside the
