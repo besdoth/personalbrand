@@ -31,12 +31,15 @@ Keep the old terminal site on the default branch until you are happy with this o
 
 The exported design is a fixed 1280px artboard — no media queries, no
 `clamp()`, every size a hard px value. A mobile layer
-(`functions/_responsive.js`) is injected at the edge for screens **700px and
-under**, which is where the design measurably starts to break; tablets and
-desktop are left exactly as drawn.
+(`functions/_responsive.js`) is injected at the edge in two tiers:
 
-It collapses the desktop grids, rescales the display type, trims the
-desktop spacing and fits the nav. Like the tracker, it is injected rather
+- **700px and under (phones):** collapses the desktop grids, rescales the
+  display type, trims the desktop spacing, fits the nav and resizes the
+  screenshot frames.
+- **701–1023px (tablets):** only the work index, the profile column and the
+  header tagline are rearranged — the rest overflowed nowhere.
+
+Desktop is left exactly as drawn. Like the tracker, it is injected rather
 than pasted into `index.html`, so it survives re-exporting the design.
 
 If you later add mobile variants in Claude Design itself, delete the
@@ -69,12 +72,15 @@ inline script in `index.html` — search for `birria-birria`. Each entry holds:
 - `p1` / `p2` / `p3` — the three pipeline nodes
 - `role`, `stack`, `state`, `host`, `url` — meta table (`url` renders the live link)
 
-Screenshots are mapped by slug in the `shots` object. Birria Birria uses a live
-capture service (`image.thum.io`) — replace that URL with a local file in
-`assets/screenshots/` if you want it guaranteed offline.
+Screenshots are mapped by slug in the `shots` object and live in
+`assets/screenshots/`. Keep them around 1800px wide and compressed (JPEG) —
+they load on phones. Live capture services don't work for sites behind
+Cloudflare's bot check (Birria Birria is), so use local files.
+
+`404.html` matters: without it Cloudflare Pages answers unknown paths with the
+whole homepage, and the bundle's unresolved `{{ … }}` image placeholders would
+each download it again.
 
 ## Still to do
 
-- Mobile layouts
-- Portrait photo on the Profile screen
-- Screenshots for Birria Birria (local) and VertexBytes
+- A higher-resolution portrait (the current one is 400×400)

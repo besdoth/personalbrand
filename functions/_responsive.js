@@ -29,6 +29,17 @@ function hook(...forms) {
   return forms.map((f) => `[style*="${f}"]`).join(",");
 }
 
+/** hook(), limited to one element type or narrowed by an extra selector. */
+function hookOn(prefix, ...forms) {
+  return forms.map((f) => `${prefix}[style*="${f}"]`).join(",");
+}
+
+/** A declaration in both spellings: "gap:56px" -> ["gap:56px", "gap: 56px"]. */
+const both = (d) => [d, d.replace(":", ": ")];
+
+/** Append a descendant/child selector to every branch of a selector list. */
+const each = (list, suffix) => list.split(",").map((s) => s + suffix).join(",");
+
 /** Display sizes in the design, mapped to a phone scale. */
 const TYPE = [
   [112, 40, 1.02], [104, 38, 1.04], [96, 36, 1.04], [88, 34, 1.06],
@@ -53,7 +64,14 @@ const SPACING = [
   ["margin-top:56px", "margin-top: 56px", "margin-top: 28px"],
   ["padding:52px 0", "padding: 52px 0px", "padding-top: 30px; padding-bottom: 30px"],
   ["padding:30px 0", "padding: 30px 0px", "padding-top: 20px; padding-bottom: 20px"],
-  ["padding:32px 0", "padding: 32px 0px", "padding-top: 20px; padding-bottom: 20px; padding-left: 0px"]
+  ["padding:32px 0", "padding: 32px 0px", "padding-top: 20px; padding-bottom: 20px; padding-left: 0px"],
+  ["padding:96px", "padding: 96px", "padding-top: 56px"],
+  ["padding:76px", "padding: 76px", "padding-top: 44px"],
+  ["margin-top:100px", "margin-top: 100px", "margin-top: 56px"],
+  ["margin-top:96px", "margin-top: 96px", "margin-top: 48px"],
+  ["margin-top:76px", "margin-top: 76px", "margin-top: 40px"],
+  ["margin-top:72px", "margin-top: 72px", "margin-top: 40px"],
+  ["padding-top:72px", "padding-top: 72px", "padding-top: 40px"]
 ];
 
 const spacingRules = SPACING.map(([a, b, decl]) =>
@@ -62,15 +80,41 @@ const spacingRules = SPACING.map(([a, b, decl]) =>
 
 const CONTAINER = hook("max-width:1180px", "max-width: 1180px");
 const NAV       = hook("gap:30px", "gap: 30px");
-const TAGLINE   = hook("font-size:9.5px", "font-size: 9.5px");
+// Only the header tagline is a <span> at 9.5px; the case-study meta labels
+// (Role / Stack / Status / Live / Pipeline) share the size but are <div>s.
+const TAGLINE   = hookOn("span", ...both("font-size:9.5px"));
+
+/** Case-study screenshot frame, home-page figure, work-index thumbnails. */
+const SHOT_FRAME = hook(...both("min-height:420px"));
+const FIGURE_IMG = hookOn("img", ...both("height:520px"));
+const THUMB      = hook(...both("height:92px"));
+
+/** Work index row (number, thumbnail, title, category, link). */
+const WORK_ROW = hook(...both("grid-template-columns:74px 148px"));
+/** Profile: portrait + spec column beside the bio. */
+const ABOUT_GRID = hook(...both("grid-template-columns:420px"));
+
+/** Label/value and numbered lists: narrow first column, stay two-up on phones. */
+const PAIRS = [[96, 84], [52, 36], [44, 32]].map(([from, to]) =>
+  `  ${hook(...both(`grid-template-columns:${from}px 1fr`))} { grid-template-columns: ${to}px minmax(0, 1fr) !important; gap: 14px !important; }`
+).join("\n");
+
+/** Section-level grids keep clear air between their stacked halves. */
+const SECTION_GAPS = [48, 56, 64, 72].map((g) =>
+  both(`gap:${g}px`).map((f) => `[style*="grid-template-columns"][style*="${f}"]`).join(",")
+).join(",");
+
+/** Pipeline diagram: three fixed-width nodes in one row. */
+const PIPE_BOX  = both("margin-top:40px")
+  .flatMap((m) => both("padding:26px").map((p) => `[style*="${m}"][style*="${p}"]`)).join(",");
+const PIPE_NODE = hook(...both("padding:9px 12px"));
 const PILL      = hook("gap:7px", "gap: 7px");
 
 export const RESPONSIVE_CSS = `
-/* ===== phones and small tablets =====================================
-   Measured, not guessed: the design holds together unaided down to
-   700px and only starts overflowing at 640px. So tablets keep the
-   layout they were drawn for, and only genuinely narrow screens get
-   rebuilt below. */
+/* ===== phones =======================================================
+   Everything at 700px and under is rebuilt as a single column. Tablets
+   (701-1023px) keep the drawn layout apart from the few grids that
+   overflow there — see the tablet block at the end. */
 @media (max-width: 700px) {
 
   /* Page gutters: 48px a side is a quarter of a phone screen. */
@@ -82,9 +126,28 @@ export const RESPONSIVE_CSS = `
   /* Collapse every desktop grid to one column. Keys on the property name,
      so grids added in a future export are covered too. */
   [style*="grid-template-columns"] {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
     gap: 18px !important;
     align-items: start !important;
+  }
+  ${SECTION_GAPS} { gap: 36px !important; }
+${PAIRS}
+
+  /* --- images --------------------------------------------------------- */
+  /* Desktop frames are fixed heights; at phone width they leave a sliver
+     (thumbnails), a narrow crop (home figure) or dead space (case study). */
+  ${THUMB} {
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    position: relative !important;
+    padding: 0 !important;
+  }
+  ${each(THUMB, " > img")} { position: absolute; inset: 0; }
+  ${FIGURE_IMG} { height: auto !important; }
+  ${SHOT_FRAME} {
+    min-height: 0 !important;
+    padding: 10px !important;
+    align-items: center !important;
   }
 
   /* --- top bar ----------------------------------------------------- */
@@ -141,6 +204,39 @@ ${spacingRules}
   }
 ${narrowType}
   ${NAV} { gap: 14px !important; font-size: 9.5px !important; }
+
+  /* The three pipeline nodes need ~310px; a 320px phone has 288. */
+  ${PIPE_BOX} { padding: 14px !important; }
+  ${PIPE_NODE} { padding: 7px 8px !important; font-size: 10px !important; }
+}
+
+/* ===== tablets ======================================================
+   iPad portrait (768-834px) is too narrow for the work index's five
+   columns and the profile's 420px portrait column, and the header
+   tagline pushes the nav off-screen. Rearrange those; leave the rest. */
+@media (min-width: 701px) and (max-width: 1023px) {
+  ${CONTAINER} {
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+  ${TAGLINE} { display: none !important; }
+
+  /* Number and thumbnail on the left; title, category and link stacked. */
+  ${WORK_ROW} {
+    grid-template-columns: 52px 132px minmax(0, 1fr) !important;
+    gap: 8px 22px !important;
+    align-items: start !important;
+  }
+  ${each(WORK_ROW, " > :nth-child(1)")} { grid-column: 1 !important; grid-row: 1 / span 3 !important; }
+  ${each(WORK_ROW, " > :nth-child(2)")} { grid-column: 2 !important; grid-row: 1 / span 3 !important; }
+  ${each(WORK_ROW, " > :nth-child(n+3)")} { grid-column: 3 !important; text-align: left !important; }
+
+  ${ABOUT_GRID} {
+    grid-template-columns: 240px minmax(0, 1fr) !important;
+    gap: 40px !important;
+  }
+
+  ${SHOT_FRAME} { min-height: 0 !important; align-items: center !important; }
 }
 
 /* An unresolved template placeholder must not render as a broken image. */
