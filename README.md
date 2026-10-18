@@ -80,7 +80,3 @@ Cloudflare's bot check (Birria Birria is), so use local files.
 `404.html` matters: without it Cloudflare Pages answers unknown paths with the
 whole homepage, and the bundle's unresolved `{{ … }}` image placeholders would
 each download it again.
-
-## Still to do
-
-- A higher-resolution portrait (the current one is 400×400)
