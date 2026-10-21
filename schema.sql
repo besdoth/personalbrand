@@ -55,3 +55,11 @@ CREATE INDEX IF NOT EXISTS idx_events_type_ts  ON events (type, ts);
 CREATE INDEX IF NOT EXISTS idx_events_visitor  ON events (visitor);
 CREATE INDEX IF NOT EXISTS idx_events_session  ON events (session);
 CREATE INDEX IF NOT EXISTS idx_events_bot_ts   ON events (bot, ts);
+
+-- Failed /admin logins, for the lockout in functions/api/login.js.
+CREATE TABLE IF NOT EXISTS login_attempts (
+  ip_hash TEXT    NOT NULL,
+  ts      INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_login_attempts ON login_attempts (ip_hash, ts);

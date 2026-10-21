@@ -117,9 +117,14 @@
   }
 
   /* ------------------------------ helpers ------------------------------ */
+  /* Text pieces joined with a space, so "email@x.com" + "Write to me" in
+     separate spans doesn't become one word. (innerText would also do that,
+     but it applies CSS uppercase and would log "WORK" instead of "Work".) */
   function text(el) {
     return safe(function () {
-      return (el.textContent || "").replace(/\s+/g, " ").trim().slice(0, MAX_LABEL);
+      var parts = [], walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), n;
+      while ((n = walk.nextNode())) parts.push(n.nodeValue);
+      return parts.join(" ").replace(/\s+/g, " ").trim().slice(0, MAX_LABEL);
     }, "");
   }
 

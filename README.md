@@ -48,16 +48,17 @@ If you later add mobile variants in Claude Design itself, delete the
 ## Analytics
 
 Visits and clicks are tracked into your own Cloudflare D1 database and shown at
-**`/stats`** (password-protected): where in the world people are, which links
-they click, where they go next, and which shared link brought them.
+**`/admin`** (sign-in required): each visit with its location, device and
+step-by-step path, plus where in the world people are, which links they
+click, where they go next, and which shared link brought them.
 
 Setup and how it works: **[ANALYTICS.md](ANALYTICS.md)**.
 
 ```
 assets/js/track.js        tracker (injected automatically — survives redesigns)
-functions/                the /api/track, /api/stats and /api/health endpoints
-stats/index.html          the dashboard
-schema.sql                the D1 table
+functions/                /api/track, login/logout, stats, visitors, health
+admin/index.html          the dashboard
+schema.sql                the D1 tables
 ```
 
 Health check after deploying: `https://besiserver.co.uk/api/health`.

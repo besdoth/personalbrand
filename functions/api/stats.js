@@ -1,59 +1,24 @@
 /**
- * GET /api/stats — everything the dashboard at /stats renders.
+ * GET /api/stats — the aggregate figures on the /admin dashboard.
  *
  * Reads straight from the raw D1 rows, so the numbers are counts of actual
- * events, not estimates. Protected by STATS_PASSWORD (a Pages secret).
+ * events, not estimates. Requires the admin session cookie (see _auth.js).
  *
  * Query params:
  *   days=7|30|90|365|all   window to report on (default 30)
  *   bots=1                 include crawlers and link-preview fetchers
  *   limit=200              size of the raw event feed
  */
+import { json, requireAdmin } from "../_auth.js";
 
 const HUMAN = "bot = 0";
-
-function unauthorized(msg) {
-  return json({ error: msg }, 401);
-}
-
-function json(obj, status = 200) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store"
-    }
-  });
-}
-
-/** Length-independent comparison so the response time doesn't leak the key. */
-function sameSecret(a, b) {
-  if (typeof a !== "string" || typeof b !== "string") return false;
-  const enc = new TextEncoder();
-  const x = enc.encode(a);
-  const y = enc.encode(b);
-  if (x.length !== y.length) return false;
-  let diff = 0;
-  for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
-  return diff === 0;
-}
 
 export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
 
-  if (!env.STATS_PASSWORD) {
-    return json({ error: "STATS_PASSWORD is not set on this Pages project. See ANALYTICS.md." }, 503);
-  }
-  if (!env.DB) {
-    return json({ error: "No D1 binding named DB on this Pages project. See ANALYTICS.md." }, 503);
-  }
-
-  const header = request.headers.get("authorization") || "";
-  const supplied = header.startsWith("Bearer ")
-    ? header.slice(7)
-    : url.searchParams.get("key") || "";
-  if (!sameSecret(supplied, env.STATS_PASSWORD)) return unauthorized("Wrong password.");
+  const denied = await requireAdmin(request, env);
+  if (denied) return denied;
 
   const daysParam = url.searchParams.get("days") || "30";
   const days = daysParam === "all" ? null : Math.min(3650, Math.max(1, parseInt(daysParam, 10) || 30));

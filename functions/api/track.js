@@ -9,6 +9,8 @@
  * Requires a D1 binding named DB. See ANALYTICS.md.
  */
 
+import { hashIp } from "../_auth.js";
+
 const MAX_BODY = 4096;
 
 const VALID_TYPES = new Set([
@@ -33,17 +35,6 @@ function num(v) {
 
 function hostOf(url) {
   try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return null; }
-}
-
-/** Salted, day-rotating hash. Lets us count unique devices without ever
- *  storing an IP address. */
-async function hashIp(ip, salt) {
-  if (!ip) return null;
-  const day = new Date().toISOString().slice(0, 10);
-  const data = new TextEncoder().encode(`${ip}|${salt}|${day}`);
-  const digest = await crypto.subtle.digest("SHA-256", data);
-  return [...new Uint8Array(digest)].slice(0, 8)
-    .map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 function parseUa(ua) {
@@ -103,10 +94,7 @@ async function handle(context) {
     const { device, os, browser } = parseUa(ua);
     const referrer = str(e.r, 400);
 
-    const ipHash = await hashIp(
-      request.headers.get("cf-connecting-ip"),
-      env.IP_SALT || "besiserver-default-salt"
-    );
+    const ipHash = await hashIp(request.headers.get("cf-connecting-ip"), env);
 
     await env.DB.prepare(INSERT).bind(
       Date.now(),

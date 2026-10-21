@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Visitors — besiserver.co.uk</title>
+<title>Admin — besiserver.co.uk</title>
 <style>
 /* ---------------------------------------------------------------- tokens */
 :root {
@@ -152,18 +152,47 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .setup code { font-family: ui-monospace, monospace; background: var(--plane); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
 .empty { color: var(--muted); font-size: 13.5px; padding: 10px 0; }
 [hidden] { display: none !important; }
+
+/* -------------------------------------------------------------- visitors */
+.visits { border-top: 1px solid var(--grid); }
+.visit {
+  display: block; width: 100%; text-align: left; font: inherit; color: inherit;
+  background: none; border: 0; border-bottom: 1px solid var(--grid);
+  padding: 12px 2px; cursor: pointer;
+}
+.visit:hover { background: var(--plane); }
+.visit .l1 { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.visit .who { font-weight: 600; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.visit .who .net { font-weight: 400; color: var(--ink-2); }
+.visit .when { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+.visit .l2 { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; font-size: 12.5px; color: var(--ink-2); }
+.visit .path { margin-top: 5px; font-size: 12.5px; color: var(--muted); }
+.visit .path b { color: var(--ink-2); font-weight: 500; }
+.visit .chev { display: inline-block; transition: transform .15s; color: var(--muted); margin-left: 6px; }
+.visit[aria-expanded="true"] .chev { transform: rotate(90deg); }
+.pill.good { color: var(--good); }
+.pill.hot { color: var(--series-2); border-color: currentColor; }
+.journey { padding: 6px 2px 18px; border-bottom: 1px solid var(--grid); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 18px; }
+@media (max-width: 760px) { .journey { grid-template-columns: minmax(0, 1fr); } }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 5px 14px; font-size: 13px; align-content: start; }
+.facts dt { color: var(--muted); }
+.facts dd { overflow-wrap: anywhere; }
+.steps { list-style: none; font-size: 13px; }
+.steps li { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; padding: 4px 0; }
+.steps .t { color: var(--muted); font-variant-numeric: tabular-nums; }
+.more { margin-top: 12px; }
 </style>
 </head>
 <body>
 
 <!-- password gate ------------------------------------------------------- -->
-<div class="gate" id="gate">
+<div class="gate" id="gate" hidden>
   <div class="card">
-    <h1>Visitor stats</h1>
+    <h1>Admin</h1>
     <p>besiserver.co.uk</p>
     <form id="gateForm">
-      <input type="password" id="pw" placeholder="Password" autocomplete="current-password" autofocus>
-      <button class="btn" type="submit">View stats</button>
+      <input type="password" id="pw" placeholder="Password" autocomplete="current-password" required>
+      <button class="btn" type="submit">Sign in</button>
     </form>
     <div class="err" id="gateErr" hidden></div>
   </div>
@@ -173,7 +202,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 <div class="wrap" id="app" hidden>
   <div class="top">
     <div>
-      <h1>Visitors</h1>
+      <h1>Admin</h1>
       <div class="sub" id="rangeNote">—</div>
     </div>
     <div class="controls">
@@ -187,9 +216,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
       <button class="btn" id="botsBtn" aria-pressed="false">Bots off</button>
       <button class="btn" id="themeBtn" title="Toggle theme">◐</button>
       <button class="btn" id="reloadBtn">Refresh</button>
+      <button class="btn" id="logoutBtn">Sign out</button>
     </div>
   </div>
 
+  <div id="summary"></div>
+  <div class="card" id="visitorsCard" style="margin-bottom:14px">
+    <header><div><h2>Visitors</h2><div class="hint">Every visit, newest first. Tap one to see everything they did.</div></div></header>
+    <div id="visitors"></div>
+  </div>
   <div id="content"></div>
 </div>
 
@@ -206,10 +241,12 @@ const MAP_W = 1000, MAP_H = 394, LAT_TOP = 84, LAT_BOT = -58;
 const $  = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
 
-let KEY = sessionStorage.getItem("bes.key") || "";
 let DAYS = "30";
 let BOTS = false;
 let DATA = null;
+let VISITS = null;              // { visits: [...], total }
+const OPEN = new Set();         // visits expanded in the list
+const JOURNEYS = new Map();     // session id -> its events, in order
 
 /* ------------------------------------------------------------- formatting */
 const nf = new Intl.NumberFormat("en-GB");
@@ -262,21 +299,34 @@ function showTip(html, x, y) {
 function hideTip() { tip.style.opacity = "0"; }
 
 /* ------------------------------------------------------------------ fetch */
-async function load() {
-  const url = `/api/stats?days=${encodeURIComponent(DAYS)}&bots=${BOTS ? 1 : 0}&limit=200`;
-  const res = await fetch(url, { headers: { Authorization: "Bearer " + KEY }, cache: "no-store" });
-  if (res.status === 401) { const e = new Error("Wrong password."); e.auth = true; throw e; }
+/* The session cookie rides along automatically; a 401 means "show sign-in". */
+async function api(url) {
+  const res = await fetch(url, { cache: "no-store" });
   const body = await res.json().catch(() => ({}));
+  if (res.status === 401) { const e = new Error("Not signed in."); e.auth = true; throw e; }
   if (!res.ok) throw new Error(body.error || `Request failed (${res.status}).`);
   return body;
 }
+const range = () => `days=${encodeURIComponent(DAYS)}&bots=${BOTS ? 1 : 0}`;
 
 async function refresh() {
   try {
-    DATA = await load();
-    render(DATA);
+    const keep = Math.max(30, VISITS ? VISITS.visits.length : 0);
+    const [stats, visits] = await Promise.all([
+      api(`/api/stats?${range()}&limit=200`),
+      api(`/api/visitors?${range()}&limit=${keep}`)
+    ]);
+    // Re-fetch open timelines so a visit that's still going stays current.
+    await Promise.all([...OPEN].map(async (s) =>
+      JOURNEYS.set(s, (await api(`/api/visitors?session=${encodeURIComponent(s)}`)).events)));
+    showApp();
+    DATA = stats; render(DATA);
+    VISITS = visits; renderVisitors();
   } catch (err) {
-    if (err.auth) { KEY = ""; sessionStorage.removeItem("bes.key"); gate(err.message); return; }
+    if (err.auth) { gate(""); return; }
+    showApp();
+    $("#summary").innerHTML = "";
+    $("#visitorsCard").hidden = true;
     $("#content").innerHTML =
       `<div class="setup"><h2>Not ready yet</h2><p class="hint" style="margin-top:8px">${esc(err.message)}</p>
        <p class="hint" style="margin-top:12px">Check <code>/api/health</code> to see which binding is missing, and ANALYTICS.md for the setup steps.</p></div>`;
@@ -284,20 +334,173 @@ async function refresh() {
 }
 
 /* ------------------------------------------------------------------- gate */
+function showApp() {
+  $("#gate").hidden = true;
+  $("#app").hidden = false;
+  $("#visitorsCard").hidden = false;
+}
 function gate(msg) {
   $("#app").hidden = true;
   $("#gate").hidden = false;
   const e = $("#gateErr");
   e.hidden = !msg;
   e.textContent = msg || "";
+  $("#pw").focus();
 }
 $("#gateForm").addEventListener("submit", async (ev) => {
   ev.preventDefault();
-  KEY = $("#pw").value;
-  sessionStorage.setItem("bes.key", KEY);
-  $("#gate").hidden = true;
-  $("#app").hidden = false;
-  await refresh();
+  const btn = $("#gateForm button");
+  btn.disabled = true;
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: $("#pw").value })
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) { gate(body.error || `Sign-in failed (${res.status}).`); return; }
+    $("#pw").value = "";
+    await refresh();
+  } catch (e) {
+    gate("Couldn't reach the server — check your connection.");
+  } finally {
+    btn.disabled = false;
+  }
+});
+$("#logoutBtn").addEventListener("click", async () => {
+  await fetch("/api/logout", { method: "POST" }).catch(() => {});
+  VISITS = null; OPEN.clear(); JOURNEYS.clear();
+  $("#visitors").innerHTML = "";
+  gate("");
+});
+
+/* --------------------------------------------------------------- visitors */
+/* The site has one URL; each screen is known by its headline. */
+const SCREENS = [
+  [/^manual work/i, "Home"],
+  [/^\w+ builds,/i, "Work"],
+  [/^two halves/i, "Profile"],
+  [/^tell me which part/i, "Enquiries"]
+];
+function screen(label) {
+  for (const [re, name] of SCREENS) if (re.test(label || "")) return name;
+  return label || "?";
+}
+function place(v) {
+  const bits = [v.city, v.region].filter(Boolean);
+  return `${flag(v.country)} ${esc(bits.length ? bits.join(", ") : country(v.country))}`;
+}
+function cap(s) { return s ? s[0].toUpperCase() + s.slice(1) : ""; }
+function when(ts) {
+  const d = new Date(ts);
+  const today = new Date().toDateString() === d.toDateString();
+  const t = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  return today ? `today ${t}` : `${d.toLocaleDateString("en-GB", { day: "numeric", month: "short" })} ${t}`;
+}
+function source(v) {
+  if (v.tag) return `via <span class="mono">?r=${esc(v.tag)}</span>`;
+  if (v.ref_host && v.ref_host !== location.hostname.replace(/^www\./, "")) return `from ${esc(v.ref_host)}`;
+  return "typed in / direct";
+}
+
+function visitRow(v) {
+  const open = OPEN.has(v.session);
+  const path = ["Home", ...String(v.path || "").split("|").filter(Boolean).map(screen)]
+    .filter((s, i, a) => s !== a[i - 1]);
+  const badges = [
+    v.visit_no > 1 ? `<span class="pill">visit ${v.visit_no} of ${v.visits}</span>` : `<span class="pill good">new</span>`,
+    v.emails ? `<span class="pill hot">tapped your email</span>` : "",
+    v.outbound ? `<span class="pill">left via a link</span>` : "",
+    v.bot ? `<span class="pill">bot</span>` : ""
+  ].join(" ");
+  return `
+    <button class="visit" data-s="${esc(v.session)}" aria-expanded="${open}">
+      <div class="l1">
+        <div class="who">${place(v)}${v.network ? ` <span class="net">· ${esc(v.network)}</span>` : ""}</div>
+        <div class="when" title="${esc(new Date(v.start).toLocaleString("en-GB"))}">${ago(v.start)}<span class="chev">›</span></div>
+      </div>
+      <div class="l2">
+        <span>${esc([cap(v.device), v.os, v.browser].filter(Boolean).join(" · ") || "Unknown device")}</span>
+        <span>${source(v)}</span>
+        <span>${v.seconds ? `stayed ${secs(v.seconds)}` : "still here / no time yet"}</span>
+        ${v.scroll != null ? `<span>scrolled ${v.scroll}%</span>` : ""}
+        ${v.clicks ? `<span>${v.clicks} click${v.clicks === 1 ? "" : "s"}</span>` : ""}
+        ${badges}
+      </div>
+      <div class="path">${path.map((p, i) => i === path.length - 1 ? `<b>${esc(p)}</b>` : esc(p)).join(" › ")}</div>
+    </button>
+    ${open ? journey(v) : ""}`;
+}
+
+function step(e, start) {
+  const t = Math.max(0, Math.round((e.ts - start) / 1000));
+  const at = `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
+  const lbl = esc(e.label || "");
+  const what = {
+    pageview: "Arrived on the site",
+    view: `Opened <b>${esc(screen(e.label))}</b>`,
+    section: `Read “${lbl}”`,
+    click: `Clicked “${lbl}”`,
+    outbound: `Left for <span class="mono">${esc(String(e.href || "").replace(/^https?:\/\//, ""))}</span>`,
+    email: "<b>Tapped your email address</b>",
+    phone: "<b>Tapped your phone number</b>",
+    scroll: `Scrolled ${e.value}% down`,
+    engage: `Closed the tab — ${secs(e.value)} active, reached ${e.scroll || 0}%`
+  }[e.type] || esc(e.type);
+  return `<li><span class="t" title="${esc(new Date(e.ts).toLocaleTimeString("en-GB"))}">${at}</span><span>${what}</span></li>`;
+}
+
+function journey(v) {
+  const events = JOURNEYS.get(v.session);
+  const fact = (k, val) => val ? `<dt>${k}</dt><dd>${val}</dd>` : "";
+  return `<div class="journey">
+    <dl class="facts">
+      ${fact("Started", esc(when(v.start)))}
+      ${fact("Location", `${place(v)}${v.postal ? ` <span class="dim">(${esc(v.postal)} area)</span>` : ""}`)}
+      ${fact("Network", esc(v.network))}
+      ${fact("Device", esc([cap(v.device), v.os, v.browser].filter(Boolean).join(" · ")))}
+      ${fact("Screen", esc(v.screen))}
+      ${fact("Language", esc(v.lang))}
+      ${fact("Time zone", esc(v.tz))}
+      ${fact("Arrived", source(v))}
+      ${fact("First seen", v.visit_no > 1 ? esc(when(v.first_seen)) : "this visit")}
+      ${fact("Visitor ID", `<span class="mono">${esc(String(v.visitor || "").slice(0, 8))}</span>`)}
+    </dl>
+    ${events ? `<ol class="steps">${events.map((e) => step(e, events[0].ts)).join("")}</ol>`
+             : `<p class="empty">Loading what they did…</p>`}
+  </div>`;
+}
+
+function renderVisitors() {
+  const list = VISITS ? VISITS.visits : [];
+  if (!list.length) {
+    $("#visitors").innerHTML = `<p class="empty">No visits in this period yet. Open besiserver.co.uk on another device and it will appear here.</p>`;
+    return;
+  }
+  const left = VISITS.total - list.length;
+  $("#visitors").innerHTML = `<div class="visits">${list.map(visitRow).join("")}</div>` +
+    (left > 0 ? `<button class="btn more" id="moreBtn">Show ${Math.min(30, left)} more of ${nf.format(left)}</button>` : "");
+}
+
+$("#visitors").addEventListener("click", async (ev) => {
+  if (ev.target.closest("#moreBtn")) {
+    const next = await api(`/api/visitors?${range()}&offset=${VISITS.visits.length}&limit=30`);
+    VISITS.visits.push(...next.visits);
+    VISITS.total = next.total;
+    renderVisitors();
+    return;
+  }
+  const row = ev.target.closest(".visit");
+  if (!row) return;
+  const s = row.dataset.s;
+  if (OPEN.has(s)) { OPEN.delete(s); renderVisitors(); return; }
+  OPEN.add(s);
+  renderVisitors();
+  if (!JOURNEYS.has(s)) {
+    try { JOURNEYS.set(s, (await api(`/api/visitors?session=${encodeURIComponent(s)}`)).events); }
+    catch (err) { if (err.auth) return gate(""); OPEN.delete(s); }
+    renderVisitors();
+  }
 });
 
 /* ------------------------------------------------------------------ chart */
@@ -458,6 +661,7 @@ function barTable(rows, cols, opts) {
 function feedDetail(r) {
   if (r.type === "engage") return `stayed ${esc(secs(r.value))}, reached ${r.scroll || 0}% down`;
   if (r.type === "scroll") return `scrolled ${r.value}% down`;
+  if (r.type === "view") return `opened ${esc(screen(r.label))}`;
   if (r.label) return esc(r.label);
   if (r.href)  return `<span class="mono">${esc(String(r.href).replace(/^https?:\/\//, ""))}</span>`;
   return '<span class="dim">—</span>';
@@ -477,7 +681,7 @@ function render(d) {
 
   const tile = (k, v, n) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div>${n ? `<div class="n">${n}</div>` : ""}</div>`;
 
-  $("#content").innerHTML = `
+  $("#summary").innerHTML = `
     <div class="grid" style="margin-bottom:14px">
       <div class="card">
         <div class="hero">
@@ -495,8 +699,9 @@ function render(d) {
           ${tile("Returning", retPct + "%", `${fmt(ret.returning_visitors || 0)} came back`)}
         </div>
       </div>
-    </div>
+    </div>`;
 
+  $("#content").innerHTML = `
     <div class="grid" style="margin-bottom:14px">
       <div class="card">
         <header><div><h2>Over time</h2><div class="hint">Unique people and page views, per day</div></div></header>
@@ -578,7 +783,7 @@ function render(d) {
       <div class="card">
         <header><div><h2>What they actually read</h2><div class="hint">Headings scrolled into view, and project pages opened</div></div></header>
         ${barTable(d.sections, [
-          { head: "Section / page", cell: (r) => `<span class="label">${esc(r.label)}</span>` },
+          { head: "Section / page", cell: (r) => `<span class="label">${esc(r.type === "view" ? screen(r.label) : r.label)}</span>` },
           { head: "", cell: (r) => `<span class="pill">${r.type === "view" ? "opened" : "read"}</span>` },
           { head: "People", num: true, cell: (r) => nf.format(r.visitors) }
         ], { empty: "No section data yet." })}
@@ -623,11 +828,13 @@ function render(d) {
 $("#rangeSeg").addEventListener("click", (ev) => {
   const b = ev.target.closest("button[data-days]"); if (!b) return;
   DAYS = b.dataset.days;
+  VISITS = null;
   $$("#rangeSeg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
   refresh();
 });
 $("#botsBtn").addEventListener("click", (ev) => {
   BOTS = !BOTS;
+  VISITS = null;
   ev.currentTarget.setAttribute("aria-pressed", String(BOTS));
   ev.currentTarget.textContent = BOTS ? "Bots on" : "Bots off";
   refresh();
@@ -646,9 +853,9 @@ try {
 } catch (e) {}
 
 /* Refresh while the tab is open, but never in the background. */
-setInterval(() => { if (!document.hidden && KEY && !$("#app").hidden) refresh(); }, 60000);
+setInterval(() => { if (!document.hidden && !$("#app").hidden) refresh(); }, 60000);
 
-if (KEY) { $("#gate").hidden = true; $("#app").hidden = false; refresh(); } else { gate(""); }
+refresh();
 </script>
 </body>
 </html>
