@@ -39,7 +39,9 @@ function hostOf(url) {
 
 function parseUa(ua) {
   if (!ua) return { device: null, os: null, browser: null };
-  const tablet = /ipad|tablet|playbook|silk|(android(?!.*mobile))/i.test(ua);
+  // Android phones say "Mobile" somewhere; tablets don't. (In-app browsers
+  // repeat "Android" after it, so this can't be a single lookahead.)
+  const tablet = /ipad|tablet|playbook|silk/i.test(ua) || (/android/i.test(ua) && !/mobile/i.test(ua));
   const mobile = /mobi|iphone|ipod|android|blackberry|windows phone|iemobile/i.test(ua);
   const device = tablet ? "tablet" : mobile ? "mobile" : "desktop";
 
