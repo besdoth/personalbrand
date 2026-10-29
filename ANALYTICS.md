@@ -10,6 +10,7 @@ can query yourself with SQL.
 | Question | Where it shows up |
 |---|---|
 | **Each visit, one by one** — where, which device, how they arrived, and every step they took | "Visitors" (tap a visit to open its timeline) |
+| **Instagram, in depth** — share of traffic, tap-to-contact funnel, time of day, exact phone models, languages, places, projects opened | "Instagram" tab |
 | How many real people came, and when | Hero figure + "Over time" |
 | **Where in the world they were** | Map (city-level dots) + Countries + Cities |
 | Which company or ISP network they came from | "Networks" — e.g. a visit from *Google LLC* |

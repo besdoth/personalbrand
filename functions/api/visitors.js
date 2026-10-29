@@ -5,11 +5,19 @@
  * Query params for the list:
  *   days=1|7|30|90|all   window (default 30)
  *   bots=1               include crawlers and link-preview fetchers
- *   offset=0, limit=30   paging (limit up to 300)
+ *   source=instagram     only visits that came from Instagram
+ *   offset=0, limit=30   paging (limit up to 1000)
  */
 import { json, requireAdmin } from "../_auth.js";
 
 const CLICKS = "type IN ('click','outbound','email','phone')";
+
+// Instagram's bio link adds utm_source=ig (stored as tag); its in-app browser
+// names itself in the user agent; l.instagram.com is its link redirector.
+const SOURCES = {
+  instagram: `session IN (SELECT session FROM events WHERE ts >= ?1 AND (
+    tag IN ('ig','instagram') OR ref_host LIKE '%instagram.com' OR ua LIKE '%Instagram %'))`
+};
 
 export async function onRequest({ request, env }) {
   const denied = await requireAdmin(request, env);
@@ -30,9 +38,10 @@ export async function onRequest({ request, env }) {
   const days = daysParam === "all" ? null : Math.min(3650, Math.max(1, parseInt(daysParam, 10) || 30));
   const since = days ? Date.now() - days * 86400000 : 0;
   const offset = Math.max(0, parseInt(url.searchParams.get("offset"), 10) || 0);
-  const limit = Math.min(300, Math.max(1, parseInt(url.searchParams.get("limit"), 10) || 30));
-  // A fixed literal chosen here, never user input.
+  const limit = Math.min(1000, Math.max(1, parseInt(url.searchParams.get("limit"), 10) || 30));
+  // Fixed literals chosen here, never user input.
   const bots = url.searchParams.get("bots") === "1" ? "1 = 1" : "bot = 0";
+  const source = SOURCES[url.searchParams.get("source")] || "1 = 1";
 
   const [list, count] = await env.DB.batch([
     env.DB.prepare(
@@ -41,14 +50,15 @@ export async function onRequest({ request, env }) {
                 MAX(country) AS country, MAX(region) AS region, MAX(city) AS city, MAX(postal) AS postal,
                 MAX(as_org) AS network, MAX(device) AS device, MAX(os) AS os, MAX(browser) AS browser,
                 MAX(screen) AS screen, MAX(lang) AS lang, MAX(client_tz) AS tz,
-                MAX(ref_host) AS ref_host, MAX(tag) AS tag, MAX(bot) AS bot,
+                MAX(ref_host) AS ref_host, MAX(tag) AS tag, MAX(bot) AS bot, MAX(ua) AS ua,
+                MAX(CASE WHEN type = 'pageview' THEN path END) AS entry,
                 SUM(CASE WHEN type = 'engage' THEN value ELSE 0 END) AS seconds,
                 MAX(CASE WHEN type = 'scroll' THEN value WHEN type = 'engage' THEN scroll END) AS scroll,
                 SUM(CASE WHEN ${CLICKS} THEN 1 ELSE 0 END) AS clicks,
                 SUM(CASE WHEN type = 'email' THEN 1 ELSE 0 END) AS emails,
                 SUM(CASE WHEN type = 'outbound' THEN 1 ELSE 0 END) AS outbound
          FROM events
-         WHERE ts >= ?1 AND ${bots} AND session IS NOT NULL
+         WHERE ts >= ?1 AND ${bots} AND ${source} AND session IS NOT NULL
          GROUP BY session
          ORDER BY start DESC
          LIMIT ?2 OFFSET ?3
@@ -64,7 +74,8 @@ export async function onRequest({ request, env }) {
        FROM v ORDER BY start DESC`
     ).bind(since, limit, offset),
     env.DB.prepare(
-      `SELECT COUNT(DISTINCT session) AS n FROM events WHERE ts >= ?1 AND ${bots} AND session IS NOT NULL`
+      `SELECT COUNT(DISTINCT session) AS n FROM events
+       WHERE ts >= ?1 AND ${bots} AND ${source} AND session IS NOT NULL`
     ).bind(since)
   ]);
 

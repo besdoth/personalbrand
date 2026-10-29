@@ -181,6 +181,27 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .steps li { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; padding: 4px 0; }
 .steps .t { color: var(--muted); font-variant-numeric: tabular-nums; }
 .more { margin-top: 12px; }
+
+/* ------------------------------------------------------------------ tabs */
+.tabs {
+  display: flex; gap: 2px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none;
+  border-bottom: 1px solid var(--hairline);
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button {
+  font: inherit; font-size: 14px; background: none; border: 0; color: var(--ink-2); cursor: pointer;
+  padding: 9px 12px; white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tabs button:hover { color: var(--ink); }
+.tabs button[aria-selected="true"] { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
+.tabs .count { color: var(--muted); font-weight: 400; font-size: 12.5px; margin-left: 6px; }
+section[data-pane] > .grid, section[data-pane] > .card, #insta > .grid, #insta > .card { margin-bottom: 14px; }
+
+/* ------------------------------------------------------- hour-of-day bars */
+.hours { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 3px; align-items: end; height: 120px; border-bottom: 1px solid var(--axis); }
+.hcol { height: 100%; display: flex; align-items: flex-end; }
+.hbar { width: 100%; background: var(--series-1); border-radius: 3px 3px 0 0; }
+.haxis { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); margin-top: 5px; }
 </style>
 </head>
 <body>
@@ -220,12 +241,34 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
     </div>
   </div>
 
-  <div id="summary"></div>
-  <div class="card" id="visitorsCard" style="margin-bottom:14px">
-    <header><div><h2>Visitors</h2><div class="hint">Every visit, newest first. Tap one to see everything they did.</div></div></header>
-    <div id="visitors"></div>
-  </div>
-  <div id="content"></div>
+  <div id="notice"></div>
+
+  <nav class="tabs" id="tabs" role="tablist">
+    <button role="tab" data-tab="overview">Overview</button>
+    <button role="tab" data-tab="visitors">Visitors<span class="count" id="cVisitors"></span></button>
+    <button role="tab" data-tab="instagram">Instagram<span class="count" id="cInsta"></span></button>
+    <button role="tab" data-tab="feed">Live feed</button>
+  </nav>
+
+  <section data-pane="overview">
+    <div id="summary"></div>
+    <div id="content"></div>
+  </section>
+
+  <section data-pane="visitors" hidden>
+    <div class="card">
+      <header><div><h2>Visitors</h2><div class="hint">Every visit, newest first. Tap one to see everything they did.</div></div></header>
+      <div id="visitors"></div>
+    </div>
+  </section>
+
+  <section data-pane="instagram" hidden>
+    <div id="insta"></div>
+  </section>
+
+  <section data-pane="feed" hidden>
+    <div id="feedPane"></div>
+  </section>
 </div>
 
 <div class="tip" id="tip"></div>
@@ -245,6 +288,8 @@ let DAYS = "30";
 let BOTS = false;
 let DATA = null;
 let VISITS = null;              // { visits: [...], total }
+let INSTA = null;               // the same shape, Instagram visits only
+let INSTA_SHOWN = 30;           // how many of them the list shows
 const OPEN = new Set();         // visits expanded in the list
 const JOURNEYS = new Map();     // session id -> its events, in order
 
@@ -312,33 +357,54 @@ const range = () => `days=${encodeURIComponent(DAYS)}&bots=${BOTS ? 1 : 0}`;
 async function refresh() {
   try {
     const keep = Math.max(30, VISITS ? VISITS.visits.length : 0);
-    const [stats, visits] = await Promise.all([
+    const [stats, visits, insta] = await Promise.all([
       api(`/api/stats?${range()}&limit=200`),
-      api(`/api/visitors?${range()}&limit=${keep}`)
+      api(`/api/visitors?${range()}&limit=${keep}`),
+      // Every Instagram visit in range: the tab's figures are computed from them.
+      api(`/api/visitors?${range()}&source=instagram&limit=1000`)
     ]);
     // Re-fetch open timelines so a visit that's still going stays current.
     await Promise.all([...OPEN].map(async (s) =>
       JOURNEYS.set(s, (await api(`/api/visitors?session=${encodeURIComponent(s)}`)).events)));
-    showApp();
-    DATA = stats; render(DATA);
-    VISITS = visits; renderVisitors();
+    showApp(true);
+    DATA = stats; render(DATA); renderFeed(DATA);
+    VISITS = visits; INSTA = insta;
+    renderInsta();
+    renderLists();
   } catch (err) {
     if (err.auth) { gate(""); return; }
-    showApp();
-    $("#summary").innerHTML = "";
-    $("#visitorsCard").hidden = true;
-    $("#content").innerHTML =
+    showApp(false);
+    $("#notice").innerHTML =
       `<div class="setup"><h2>Not ready yet</h2><p class="hint" style="margin-top:8px">${esc(err.message)}</p>
        <p class="hint" style="margin-top:12px">Check <code>/api/health</code> to see which binding is missing, and ANALYTICS.md for the setup steps.</p></div>`;
   }
 }
 
 /* ------------------------------------------------------------------- gate */
-function showApp() {
+function showApp(ready) {
   $("#gate").hidden = true;
   $("#app").hidden = false;
-  $("#visitorsCard").hidden = false;
+  $("#tabs").hidden = !ready;
+  if (ready) { $("#notice").innerHTML = ""; showTab(currentTab()); }
+  else $$("section[data-pane]").forEach((p) => { p.hidden = true; });
 }
+
+/* ------------------------------------------------------------------- tabs */
+const TABS = ["overview", "visitors", "instagram", "feed"];
+function currentTab() {
+  const t = location.hash.slice(1);
+  return TABS.includes(t) ? t : "overview";
+}
+function showTab(t) {
+  $$("#tabs button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
+  $$("section[data-pane]").forEach((p) => { p.hidden = p.dataset.pane !== t; });
+}
+$("#tabs").addEventListener("click", (ev) => {
+  const b = ev.target.closest("button[data-tab]");
+  if (!b) return;
+  history.replaceState(null, "", "#" + b.dataset.tab);
+  showTab(b.dataset.tab);
+});
 function gate(msg) {
   $("#app").hidden = true;
   $("#gate").hidden = false;
@@ -369,8 +435,8 @@ $("#gateForm").addEventListener("submit", async (ev) => {
 });
 $("#logoutBtn").addEventListener("click", async () => {
   await fetch("/api/logout", { method: "POST" }).catch(() => {});
-  VISITS = null; OPEN.clear(); JOURNEYS.clear();
-  $("#visitors").innerHTML = "";
+  VISITS = null; INSTA = null; OPEN.clear(); JOURNEYS.clear();
+  ["#visitors", "#insta", "#summary", "#content", "#feedPane"].forEach((s) => { $(s).innerHTML = ""; });
   gate("");
 });
 
@@ -397,10 +463,63 @@ function when(ts) {
   const t = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
   return today ? `today ${t}` : `${d.toLocaleDateString("en-GB", { day: "numeric", month: "short" })} ${t}`;
 }
+function param(path, key) {
+  try { return new URL(path || "/", location.origin).searchParams.get(key); } catch (e) { return null; }
+}
+const fromInstagram = (v) => /^(ig|instagram)$/i.test(v.tag || "") || /(^|\.)instagram\.com$/.test(v.ref_host || "");
+
 function source(v) {
+  if (fromInstagram(v)) {
+    const how = param(v.entry, "utm_content");
+    return `from <b>Instagram</b>${how ? " " + esc(how === "link_in_bio" ? "bio link" : how.replace(/_/g, " ")) : ""}`;
+  }
   if (v.tag) return `via <span class="mono">?r=${esc(v.tag)}</span>`;
   if (v.ref_host && v.ref_host !== location.hostname.replace(/^www\./, "")) return `from ${esc(v.ref_host)}`;
   return "typed in / direct";
+}
+
+/* Instagram's and Facebook's in-app browsers put the exact phone model,
+   system version and app language in their user agent. */
+const IPHONES = {
+  "iPhone13,1": "iPhone 12 mini", "iPhone13,2": "iPhone 12", "iPhone13,3": "iPhone 12 Pro", "iPhone13,4": "iPhone 12 Pro Max",
+  "iPhone14,4": "iPhone 13 mini", "iPhone14,5": "iPhone 13", "iPhone14,2": "iPhone 13 Pro", "iPhone14,3": "iPhone 13 Pro Max",
+  "iPhone14,6": "iPhone SE (3rd gen)", "iPhone14,7": "iPhone 14", "iPhone14,8": "iPhone 14 Plus",
+  "iPhone15,2": "iPhone 14 Pro", "iPhone15,3": "iPhone 14 Pro Max", "iPhone15,4": "iPhone 15", "iPhone15,5": "iPhone 15 Plus",
+  "iPhone16,1": "iPhone 15 Pro", "iPhone16,2": "iPhone 15 Pro Max",
+  "iPhone17,3": "iPhone 16", "iPhone17,4": "iPhone 16 Plus", "iPhone17,1": "iPhone 16 Pro", "iPhone17,2": "iPhone 16 Pro Max", "iPhone17,5": "iPhone 16e",
+  "iPhone18,3": "iPhone 17", "iPhone18,1": "iPhone 17 Pro", "iPhone18,2": "iPhone 17 Pro Max", "iPhone18,4": "iPhone Air"
+};
+const GALAXY = {
+  "SM-S911": "Galaxy S23", "SM-S916": "Galaxy S23+", "SM-S918": "Galaxy S23 Ultra",
+  "SM-S921": "Galaxy S24", "SM-S926": "Galaxy S24+", "SM-S928": "Galaxy S24 Ultra",
+  "SM-S931": "Galaxy S25", "SM-S936": "Galaxy S25+", "SM-S938": "Galaxy S25 Ultra"
+};
+function appInfo(ua) {
+  ua = ua || "";
+  let m = ua.match(/Instagram ([\d.]+) \(((?:iPhone|iPad)[\d,]+); (?:iOS|iPadOS) ([\d_]+); ([a-z]{2,3})_([A-Z]{2})/);
+  if (m) return { app: "Instagram", version: m[1], model: IPHONES[m[2]] || m[2], os: "iOS " + m[3].replace(/_/g, "."), locale: `${m[4]}-${m[5]}` };
+  m = ua.match(/Instagram ([\d.]+) Android \(\d+\/([\d.]+); [^;]+; [^;]+; ([^;]+); ([^;]+);.*?; ([a-z]{2,3})_([A-Z]{2});/);
+  if (m) {
+    const galaxy = /^samsung$/i.test(m[3]) && GALAXY[m[4].slice(0, 7)];
+    return { app: "Instagram", version: m[1], model: galaxy ? `Samsung ${galaxy}` : `${cap(m[3])} ${m[4]}`,
+             os: "Android " + m[2], locale: `${m[5]}-${m[6]}` };
+  }
+  m = ua.match(/FBDV\/((?:iPhone|iPad)[\d,]+)/);
+  if (m) return { app: "Facebook", model: IPHONES[m[1]] || m[1] };
+  return null;
+}
+function deviceLabel(v) {
+  const a = appInfo(v.ua);
+  if (a) return [a.model, a.os, `in the ${a.app} app`].filter(Boolean).join(" · ");
+  return [cap(v.device), v.os, v.browser].filter(Boolean).join(" · ") || "Unknown device";
+}
+let langNames = null;
+try { langNames = new Intl.DisplayNames(["en"], { type: "language" }); } catch (e) {}
+function language(v) {
+  const a = appInfo(v.ua);
+  const code = (a && a.locale) || v.lang;
+  if (!code) return "";
+  try { return langNames ? langNames.of(code) : code; } catch (e) { return code; }
 }
 
 function visitRow(v) {
@@ -420,7 +539,7 @@ function visitRow(v) {
         <div class="when" title="${esc(new Date(v.start).toLocaleString("en-GB"))}">${ago(v.start)}<span class="chev">›</span></div>
       </div>
       <div class="l2">
-        <span>${esc([cap(v.device), v.os, v.browser].filter(Boolean).join(" · ") || "Unknown device")}</span>
+        <span>${esc(deviceLabel(v))}</span>
         <span>${source(v)}</span>
         <span>${v.seconds ? `stayed ${secs(v.seconds)}` : "still here / no time yet"}</span>
         ${v.scroll != null ? `<span>scrolled ${v.scroll}%</span>` : ""}
@@ -452,15 +571,18 @@ function step(e, start) {
 
 function journey(v) {
   const events = JOURNEYS.get(v.session);
+  const app = appInfo(v.ua);
   const fact = (k, val) => val ? `<dt>${k}</dt><dd>${val}</dd>` : "";
   return `<div class="journey">
     <dl class="facts">
       ${fact("Started", esc(when(v.start)))}
       ${fact("Location", `${place(v)}${v.postal ? ` <span class="dim">(${esc(v.postal)} area)</span>` : ""}`)}
       ${fact("Network", esc(v.network))}
-      ${fact("Device", esc([cap(v.device), v.os, v.browser].filter(Boolean).join(" · ")))}
+      ${fact("Device", esc(app ? app.model : [cap(v.device), v.os, v.browser].filter(Boolean).join(" · ")))}
+      ${fact("System", esc(app && app.os))}
+      ${fact("Browser", esc(app ? `${app.app}'s in-app browser${app.version ? ` (app ${app.version.split(".")[0]})` : ""}` : ""))}
       ${fact("Screen", esc(v.screen))}
-      ${fact("Language", esc(v.lang))}
+      ${fact("Language", esc(language(v)))}
       ${fact("Time zone", esc(v.tz))}
       ${fact("Arrived", source(v))}
       ${fact("First seen", v.visit_no > 1 ? esc(when(v.first_seen)) : "this visit")}
@@ -471,35 +593,154 @@ function journey(v) {
   </div>`;
 }
 
-function renderVisitors() {
-  const list = VISITS ? VISITS.visits : [];
-  if (!list.length) {
-    $("#visitors").innerHTML = `<p class="empty">No visits in this period yet. Open besiserver.co.uk on another device and it will appear here.</p>`;
-    return;
-  }
-  const left = VISITS.total - list.length;
-  $("#visitors").innerHTML = `<div class="visits">${list.map(visitRow).join("")}</div>` +
-    (left > 0 ? `<button class="btn more" id="moreBtn">Show ${Math.min(30, left)} more of ${nf.format(left)}</button>` : "");
+function visitList(list, total, moreId, empty) {
+  if (!list.length) return `<p class="empty">${empty}</p>`;
+  const left = total - list.length;
+  return `<div class="visits">${list.map(visitRow).join("")}</div>` +
+    (left > 0 ? `<button class="btn more" id="${moreId}">Show ${Math.min(30, left)} more of ${nf.format(left)}</button>` : "");
 }
 
-$("#visitors").addEventListener("click", async (ev) => {
+/* Both lists share OPEN/JOURNEYS, so a visit opened in one is open in both. */
+function renderLists() {
+  $("#cVisitors").textContent = VISITS ? nf.format(VISITS.total) : "";
+  $("#cInsta").textContent = INSTA ? nf.format(INSTA.total) : "";
+  $("#visitors").innerHTML = visitList(VISITS ? VISITS.visits : [], VISITS ? VISITS.total : 0, "moreBtn",
+    "No visits in this period yet. Open besiserver.co.uk on another device and it will appear here.");
+  const list = $("#instaList");
+  if (list) list.innerHTML = visitList(INSTA.visits.slice(0, INSTA_SHOWN), INSTA.visits.length, "instaMore",
+    "No Instagram visits in this period.");
+}
+
+/* ---------------------------------------------------------------- instagram */
+const PAGES = ["Home", "Work", "Profile", "Enquiries"];
+const screensOf = (v) => String(v.path || "").split("|").filter(Boolean).map(screen);
+const pct = (n, of) => (of ? Math.round((n / of) * 100) : 0) + "%";
+const hourUK = (ts) => Number(new Date(ts).toLocaleString("en-GB", { timeZone: "Europe/London", hour: "2-digit", hourCycle: "h23" })) % 24;
+const hh = (h) => String(h % 24).padStart(2, "0") + ":00";
+
+function tally(list, keyOf) {
+  const m = new Map();
+  list.forEach((v) => [].concat(keyOf(v)).filter(Boolean).forEach((k) => m.set(k, (m.get(k) || 0) + 1)));
+  return [...m].map(([name, visits]) => ({ name, visits })).sort((a, b) => b.visits - a.visits);
+}
+
+function hourChart(list) {
+  const h = new Array(24).fill(0);
+  list.forEach((v) => h[hourUK(v.start)]++);
+  const max = Math.max(1, ...h);
+  const peak = h.indexOf(Math.max(...h));
+  return `<div class="hours">${h.map((n, i) =>
+      `<div class="hcol" title="${hh(i)}–${hh(i + 1)} · ${n} visit${n === 1 ? "" : "s"}"><div class="hbar" style="height:${n ? Math.max(4, (n / max) * 100) : 0}%"></div></div>`).join("")}</div>
+    <div class="haxis"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+    <p class="hint" style="margin-top:10px">Busiest: <b>${hh(peak)}–${hh(peak + 1)}</b> UK time. Hover a bar for its count.</p>`;
+}
+
+function renderInsta() {
+  const all = INSTA.visits;
+  const n = all.length;
+  if (!n) {
+    $("#insta").innerHTML = `<div class="card"><p class="empty">No Instagram visits in this period. They arrive through the link in your Instagram bio.</p></div>`;
+    return;
+  }
+  const people = new Set(all.map((v) => v.visitor)).size;
+  const timed = all.filter((v) => v.seconds > 0);
+  const avg = timed.length ? timed.reduce((s, v) => s + v.seconds, 0) / timed.length : 0;
+  const inApp = all.filter((v) => appInfo(v.ua)).length;
+  const funnel = [
+    { name: "Tapped your link", visits: n },
+    { name: "Stayed 10s+ or scrolled", visits: all.filter((v) => v.seconds >= 10 || v.scroll >= 25).length },
+    { name: "Opened another page", visits: all.filter((v) => screensOf(v).some((s) => s !== "Home")).length },
+    { name: "Opened a project", visits: all.filter((v) => screensOf(v).some((s) => !PAGES.includes(s))).length },
+    { name: "Went to Enquiries", visits: all.filter((v) => screensOf(v).includes("Enquiries")).length },
+    { name: "Tapped your email", visits: all.filter((v) => v.emails > 0).length }
+  ];
+  const tile = (k, v, sub) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div>${sub ? `<div class="n">${sub}</div>` : ""}</div>`;
+  const count = (rows, head, empty) => barTable(rows, [
+    { head, cell: (r) => `<span class="label">${r.html || esc(r.name)}</span>` },
+    { head: "Visits", num: true, cell: (r) => nf.format(r.visits) }
+  ], { empty, metric: "visits" });
+
+  $("#insta").innerHTML = `
+    <div class="card">
+      <div class="hero">
+        <div class="fig">${fmt(n)}</div>
+        <div class="cap">visit${n === 1 ? "" : "s"} from Instagram · ${pct(n, VISITS ? VISITS.total : 0)} of all visits</div>
+      </div>
+      <div class="tiles">
+        ${tile("People", fmt(people), `${fmt(all.filter((v) => v.visit_no > 1).length)} return visits`)}
+        ${tile("Time on site", avg ? secs(avg) : "—", "average, when measured")}
+        ${tile("Looked around", pct(funnel[2].visits, n), "opened another page")}
+        ${tile("Opened a project", pct(funnel[3].visits, n), `${fmt(funnel[3].visits)} visits`)}
+        ${tile("Tapped your email", fmt(funnel[5].visits), pct(funnel[5].visits, n) + " of visits")}
+        ${tile("Stayed in the app", pct(inApp, n), "used Instagram's browser")}
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <header><div><h2>From tap to contact</h2><div class="hint">How far Instagram visitors get, as a share of everyone who tapped</div></div></header>
+        ${barTable(funnel, [
+          { head: "Step", cell: (r) => esc(r.name) },
+          { head: "Visits", num: true, cell: (r) => nf.format(r.visits) },
+          { head: "", num: true, cell: (r) => `<span class="dim">${pct(r.visits, n)}</span>` }
+        ], { metric: "visits" })}
+      </div>
+      <div class="card">
+        <header><div><h2>When they come</h2><div class="hint">Visits by hour of day — useful for when to post</div></div></header>
+        ${hourChart(all)}
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <header><div><h2>Phones</h2><div class="hint">Exact model when they browse inside Instagram</div></div></header>
+        ${count(tally(all, (v) => { const a = appInfo(v.ua); return a ? a.model : `${v.os || cap(v.device) || "Unknown"} — opened outside the app`; }), "Phone", "")}
+      </div>
+      <div class="card">
+        <header><div><h2>Languages</h2><div class="hint">The language their Instagram app or browser is set to</div></div></header>
+        ${count(tally(all, language), "Language", "No language data.")}
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <header><div><h2>Where they are</h2><div class="hint">Town or city they connected from</div></div></header>
+        ${count(tally(all, (v) => `${v.country || "??"}|${v.city || country(v.country)}`).map((r) => {
+          const [cc, city] = r.name.split("|");
+          return { ...r, html: `${flag(cc)} ${esc(city)}` };
+        }), "Place", "No location data.")}
+      </div>
+      <div class="card">
+        <header><div><h2>Projects they opened</h2><div class="hint">Which case studies Instagram visitors read</div></div></header>
+        ${count(tally(all, (v) => [...new Set(screensOf(v).filter((s) => !PAGES.includes(s)))]), "Project", "None opened yet.")}
+      </div>
+    </div>
+
+    <div class="card">
+      <header><div><h2>Instagram visits</h2><div class="hint">Newest first. Tap one to see everything they did.</div></div></header>
+      <div id="instaList"></div>
+    </div>`;
+}
+
+$("#app").addEventListener("click", async (ev) => {
   if (ev.target.closest("#moreBtn")) {
     const next = await api(`/api/visitors?${range()}&offset=${VISITS.visits.length}&limit=30`);
     VISITS.visits.push(...next.visits);
     VISITS.total = next.total;
-    renderVisitors();
+    renderLists();
     return;
   }
+  if (ev.target.closest("#instaMore")) { INSTA_SHOWN += 30; renderLists(); return; }
   const row = ev.target.closest(".visit");
   if (!row) return;
   const s = row.dataset.s;
-  if (OPEN.has(s)) { OPEN.delete(s); renderVisitors(); return; }
+  if (OPEN.has(s)) { OPEN.delete(s); renderLists(); return; }
   OPEN.add(s);
-  renderVisitors();
+  renderLists();
   if (!JOURNEYS.has(s)) {
     try { JOURNEYS.set(s, (await api(`/api/visitors?session=${encodeURIComponent(s)}`)).events); }
     catch (err) { if (err.auth) return gate(""); OPEN.delete(s); }
-    renderVisitors();
+    renderLists();
   }
 });
 
@@ -772,7 +1013,7 @@ function render(d) {
       <div class="card">
         <header><div><h2>Your share links</h2><div class="hint">Traffic tagged with <span class="mono">?r=</span> — see below</div></div></header>
         ${barTable(d.tags, [
-          { head: "Tag", cell: (r) => `<span class="label mono">?r=${esc(r.tag)}</span>` },
+          { head: "Tag", cell: (r) => /^(ig|instagram)$/i.test(r.tag) ? "Instagram bio link" : `<span class="label mono">?r=${esc(r.tag)}</span>` },
           { head: "People", num: true, cell: (r) => nf.format(r.visitors) },
           { head: "Clicks", num: true, cell: (r) => `<span class="dim">${nf.format(r.clicks)}</span>` }
         ], { empty: "No tagged links used yet. Share besiserver.co.uk/?r=linkedin (or any word) and it shows up here." })}
@@ -800,8 +1041,14 @@ function render(d) {
       <div class="card"><header><h2>Systems</h2></header>
         ${barTable(d.systems, [{ head: "OS", cell: (r) => esc(r.name) },
                                 { head: "People", num: true, cell: (r) => nf.format(r.visitors) }])}</div>
-    </div>
+    </div>`;
 
+  wireChart(d.daily || []);
+  wireMap(map.pts);
+}
+
+function renderFeed(d) {
+  $("#feedPane").innerHTML = `
     <div class="grid">
       <div class="card">
         <header><div><h2>Live feed</h2><div class="hint">Every raw event, newest first — this is the actual data, not a rollup</div></div></header>
@@ -819,22 +1066,19 @@ function render(d) {
         </div>
       </div>
     </div>`;
-
-  wireChart(d.daily || []);
-  wireMap(map.pts);
 }
 
 /* ---------------------------------------------------------------- controls */
 $("#rangeSeg").addEventListener("click", (ev) => {
   const b = ev.target.closest("button[data-days]"); if (!b) return;
   DAYS = b.dataset.days;
-  VISITS = null;
+  VISITS = null; INSTA_SHOWN = 30;
   $$("#rangeSeg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
   refresh();
 });
 $("#botsBtn").addEventListener("click", (ev) => {
   BOTS = !BOTS;
-  VISITS = null;
+  VISITS = null; INSTA_SHOWN = 30;
   ev.currentTarget.setAttribute("aria-pressed", String(BOTS));
   ev.currentTarget.textContent = BOTS ? "Bots on" : "Bots off";
   refresh();
