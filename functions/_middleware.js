@@ -3,6 +3,7 @@
  *   1. the mobile layer  (the export is a fixed 1280px design — see _responsive.js)
  *   2. the tracking script, and the enquiry form's script
  *   3. the page title, description and link-preview tags
+ *   4. the Google tag (Google Tag Manager → Google Analytics)
  *
  * Why here and not in index.html: index.html is a generated Claude Design
  * bundle. Re-exporting the design overwrites the whole file, so anything
@@ -35,6 +36,19 @@ const HEAD =
   `})();</script>` +
   `<script defer src="/assets/js/track.js"></script>` +
   `<script defer src="/assets/js/enquiry.js"></script>`;
+
+/* Google Analytics via Google Tag Manager — Google's snippet, placed right
+   after <head>. The only change: gtm.js isn't loaded on devices opted out
+   with /?optout=1, so your own browsing stays out of Google Analytics too. */
+const GTM_ID = "GTM-T3QVFWTX";
+const GOOGLE_TAG =
+  `<script>` +
+  `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());` +
+  `(function(){try{var o=new URLSearchParams(location.search).get("optout");` +
+  `if(o==="1"||(o!=="0"&&localStorage.getItem("bes.optout")==="1"))return;}catch(e){}` +
+  `var s=document.createElement("script");s.async=true;` +
+  `s.src="https://www.googletagmanager.com/gtm.js?id=${GTM_ID}";document.head.appendChild(s);})();` +
+  `</script>`;
 
 /* What search engines and link previews (Instagram DMs, WhatsApp, iMessage)
    read. They don't run the bundle, so it has to be in the served HTML. */
@@ -71,7 +85,10 @@ export async function onRequest(context) {
         element(title) { title.setInnerContent(TITLE); }
       })
       .on("head", {
-        element(head) { head.append(seo(origin) + HEAD, { html: true }); }
+        element(head) {
+          head.prepend(GOOGLE_TAG, { html: true });
+          head.append(seo(origin) + HEAD, { html: true });
+        }
       })
       .transform(response);
   } catch (err) {

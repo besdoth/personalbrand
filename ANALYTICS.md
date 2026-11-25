@@ -135,9 +135,22 @@ traffic and reports rounded aggregates. This counts every event it receives.
 Expect this to read *higher* than the Cloudflare panel, and to be the more
 accurate of the two.
 
+## Google Analytics
+
+Google Tag Manager container **`GTM-T3QVFWTX`** is added to every page of the
+site (not `/admin`) by `functions/_middleware.js`, straight after `<head>`, so it
+survives design re-exports. What it sends is configured in Tag Manager (the
+container's Google Analytics tag); publish changes there, not here.
+
+- `/?optout=1` keeps a device out of Google Analytics as well as this tracker.
+- The site has one URL, so Google Analytics records one page per visit. The
+  screen-by-screen journey is in `/admin` → Visitors.
+
 ## Privacy
 
-- No cookies. One anonymous random id in `localStorage`, first-party only.
+- This tracker sets no cookies: one anonymous random id in `localStorage`,
+  first-party only. **Google Analytics does set cookies** (`_ga…`), which UK
+  rules generally expect visitors to agree to through a cookie banner.
 - **IP addresses are never stored.** They are hashed with `IP_SALT` (or, if
   that isn't set, `STATS_PASSWORD`) plus the current date, so the hash rotates
   daily and cannot be reversed to an address.
