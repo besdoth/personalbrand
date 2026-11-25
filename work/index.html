@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());(function(){try{var o=new URLSearchParams(location.search).get("optout");if(o==="1"||(o!=="0"&&localStorage.getItem("bes.optout")==="1"))return;}catch(e){}var s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtm.js?id=GTM-T3QVFWTX";document.head.appendChild(s);})();</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automation Case Studies | Bes</title>
+<meta name="description" content="Four automation systems running for clients: a restaurant ordering queue, an AI customer-support inbox, a blood-test dashboard and a trading signals tool.">
+<link rel="canonical" href="https://besiserver.co.uk/work/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://besiserver.co.uk/work/">
+<meta property="og:title" content="Automation Case Studies | Bes">
+<meta property="og:description" content="Four automation systems running for clients: a restaurant ordering queue, an AI customer-support inbox, a blood-test dashboard and a trading signals tool.">
+<meta property="og:image" content="https://besiserver.co.uk/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/assets/fonts/InstrumentSerif-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/Archivo.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:Archivo;src:url(/assets/fonts/Archivo.woff2) format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:Serif;src:url(/assets/fonts/InstrumentSerif-Regular.woff2) format('woff2');font-display:swap}
+@font-face{font-family:Serif;font-style:italic;src:url(/assets/fonts/InstrumentSerif-Italic.woff2) format('woff2');font-display:swap}
+@font-face{font-family:Mono;src:url(/assets/fonts/JetBrainsMono.woff2) format('woff2');font-weight:100 900;font-display:swap}
+:root{--paper:#f4f2ea;--ink:#16170f;--rust:#7a3b1f;--mute:rgba(22,23,15,.6);--line:rgba(22,23,15,.16);--card:#ece9de}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.65 Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{max-width:100%;height:auto;display:block}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.eyebrow,.crumbs,.nav,.label{font-family:Mono,ui-monospace,monospace}
+header{position:sticky;top:0;z-index:10;background:rgba(244,242,234,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:space-between;min-height:62px;padding-top:8px;padding-bottom:8px}
+.brand{font-family:Serif,Georgia,serif;font-size:26px;text-decoration:none;letter-spacing:-.01em}
+.brand span{font-family:Mono,monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-left:10px}
+.nav{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase}
+.nav a{text-decoration:none;color:var(--mute)}
+.nav a:hover,.nav a[aria-current]{color:var(--ink)}
+.nav .book{color:var(--rust)}
+.crumbs{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:40px 0 0}
+.crumbs a{text-decoration:none}
+.eyebrow{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--rust);margin:28px 0 0}
+h1,h2,h3{font-family:Serif,Georgia,serif;font-weight:400;letter-spacing:-.015em;margin:0}
+h1{font-size:clamp(42px,7.4vw,88px);line-height:.98;margin-top:18px;max-width:16ch}
+h1 em,h2 em{color:var(--rust)}
+h2{font-size:clamp(32px,4.6vw,50px);line-height:1.05}
+h3{font-size:27px;line-height:1.12}
+.lede{font-size:clamp(18px,2.2vw,21px);line-height:1.6;color:rgba(22,23,15,.76);max-width:60ch;margin:26px 0 0}
+.ctas{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:30px}
+.cta{font-family:Mono,monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--rust);border-bottom:1px solid var(--rust);padding-bottom:6px}
+.cta.alt{color:var(--mute);border-color:var(--line)}
+section{padding:72px 0 0}
+.label{display:flex;justify-content:space-between;gap:12px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);padding-bottom:14px;border-bottom:1px solid var(--ink);margin-bottom:8px}
+.prose{max-width:66ch;color:rgba(22,23,15,.78)}
+.prose p{margin:18px 0 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(250px,100%),1fr));gap:0 36px}
+.card{padding:26px 0 28px;border-bottom:1px solid var(--line)}
+.card .n{font-family:Mono,monospace;font-size:11px;color:var(--rust)}
+.card h3{margin-top:12px}
+.card p{margin:10px 0 0;font-size:15.5px;color:rgba(22,23,15,.68)}
+.ticks{list-style:none;padding:0;margin:18px 0 0;max-width:66ch}
+.ticks li{padding:12px 0 12px 30px;border-bottom:1px solid var(--line);position:relative;color:rgba(22,23,15,.8)}
+.ticks li::before{content:"";position:absolute;left:4px;top:21px;width:12px;height:7px;border:solid var(--rust);border-width:0 0 2px 2px;transform:rotate(-45deg)}
+.feature{display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:center;margin-top:26px}
+.shot{border:1px solid var(--line);background:var(--card);padding:10px}
+.cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:28px;margin-top:26px}
+.case{text-decoration:none;display:block}
+.case .shot{aspect-ratio:16/10;overflow:hidden;padding:0}
+.case .shot img{width:100%;height:100%;object-fit:cover;object-position:top center}
+.case h3{margin-top:16px}
+.case p{margin:6px 0 0;font-size:15.5px;color:rgba(22,23,15,.66)}
+.case .label{border:0;padding:0;margin:10px 0 0;color:var(--rust)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:18px 32px;padding:22px 0;margin-top:40px;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);font-family:Mono,monospace;font-size:13px}
+.meta b{display:block;font-weight:400;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.figure{margin:36px 0 0}
+.figure figcaption{font-family:Mono,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-top:12px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:18px 0 0;max-width:66ch}
+.steps li{counter-increment:s;display:grid;grid-template-columns:46px 1fr;gap:12px;padding:18px 0;border-bottom:1px solid var(--line);color:rgba(22,23,15,.8)}
+.steps li::before{content:counter(s,decimal-leading-zero);font-family:Mono,monospace;font-size:12px;color:var(--rust);padding-top:4px}
+.impact{font-family:Serif,Georgia,serif;font-size:clamp(26px,3.4vw,36px);line-height:1.22;max-width:30ch;margin-top:20px}
+details{border-bottom:1px solid var(--line);padding:18px 0;max-width:72ch}
+summary{cursor:pointer;font-family:Serif,Georgia,serif;font-size:24px;line-height:1.25;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";float:right;font-family:Mono,monospace;color:var(--rust)}
+details[open] summary::after{content:"–"}
+details p{margin:12px 0 0;color:rgba(22,23,15,.76)}
+.book-wrap{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;margin-top:26px}
+form{background:var(--ink);color:var(--paper);padding:28px 28px 24px}
+form .t{font-family:Serif,Georgia,serif;font-size:30px;line-height:1.1}
+form .s{font-family:Mono,monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#d9c3b4;margin-top:8px}
+form label{display:block;margin-top:18px;font-family:Mono,monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,234,.62)}
+form input,form textarea{display:block;width:100%;margin-top:8px;padding:12px 14px;background:rgba(244,242,234,.06);border:1px solid rgba(244,242,234,.24);border-radius:0;color:var(--paper);font:16px Archivo,system-ui,sans-serif}
+form textarea{resize:vertical}
+form button{margin-top:22px;width:100%;display:flex;justify-content:space-between;padding:16px 18px;background:var(--paper);color:var(--ink);border:0;font-family:Mono,monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+form .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+[data-enquiry-status]{margin:14px 0 0;min-height:1.5em;font-size:14px}
+.related{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:22px}
+footer{margin-top:90px;border-top:1px solid var(--line);padding:26px 0 48px;font-family:Mono,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:14px 28px;justify-content:space-between}
+footer nav{display:flex;flex-wrap:wrap;gap:10px 22px}
+footer a{text-decoration:none}
+@media (max-width:760px){.feature,.book-wrap{grid-template-columns:1fr}.brand span{display:none}section{padding-top:56px}}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "ProfessionalService", "@id": "https://besiserver.co.uk/#business", "name": "Bes", "alternateName": "Bes — automation for small businesses", "url": "https://besiserver.co.uk/", "image": "https://besiserver.co.uk/assets/og.jpg", "description": "Automation for UK small businesses: AI customer-email inboxes, order and booking pipelines, follow-ups, reporting dashboards and websites wired into them.", "founder": {"@type": "Person", "@id": "https://besiserver.co.uk/#besfort", "name": "Besfort Hyseni", "jobTitle": "Automation developer", "url": "https://besiserver.co.uk/"}, "areaServed": [{"@type": "Country", "name": "United Kingdom"}, {"@type": "City", "name": "Leeds"}], "knowsAbout": ["Business process automation", "AI automation", "n8n", "Workflow automation", "AI agents", "Email automation", "Web development"]}, {"@type": "CollectionPage", "@id": "https://besiserver.co.uk/work/#page", "name": "Automation case studies", "hasPart": [{"@id": "https://besiserver.co.uk/work/birria-birria/#article"}, {"@id": "https://besiserver.co.uk/work/abode-email-support/#article"}, {"@id": "https://besiserver.co.uk/work/blood-testing-panel/#article"}, {"@id": "https://besiserver.co.uk/work/trading-tool/#article"}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://besiserver.co.uk/"}, {"@type": "ListItem", "position": 2, "name": "Case studies", "item": "https://besiserver.co.uk/work/"}]}]}</script>
+<script defer src="/assets/js/track.js"></script>
+<script defer src="/assets/js/enquiry.js"></script>
+</head>
+<body>
+<header><div class="wrap">
+<a class="brand" href="/">Bes<span>automation for small businesses</span></a>
+<nav class="nav"><a href="/work/" aria-current="page">Work</a><a href="/ai-automation-agency/">AI automation</a><a href="/n8n-automation/">n8n</a><a href="/leeds/">Leeds</a><a class="book" href="#book">Book a call</a></nav>
+</div></header>
+<main class="wrap">
+<p class="crumbs"><a href="/">Home</a> / Case studies</p><p class="eyebrow">Case studies</p><h1>Four builds, all <em>running for clients.</em></h1><p class="lede">A restaurant ordering queue, an AI customer-support inbox, a blood-test dashboard and a trading signals tool — each one replacing a manual job with a system that runs itself.</p><section><div class="cases"><a class="case" href="/work/birria-birria/"><div class="shot"><img src="/assets/screenshots/birriabirria.jpg" alt="Birria Birria&#x27;s online ordering page" width="1800" height="963" loading="lazy"></div><h3>Birria Birria</h3><p>Website orders, Instagram DMs and walk-ups funnelled into one live prep queue.</p><div class="label">Hospitality · ordering &amp; ops →</div></a><a class="case" href="/work/abode-email-support/"><div class="shot"><img src="/assets/screenshots/abode.jpg" alt="The n8n workflow behind Abode&#x27;s AI support inbox" width="1800" height="932" loading="lazy"></div><h3>Abode Email Support</h3><p>An AI inbox that sorts, answers and refunds customer emails — with a yes/no from the owner on Telegram.</p><div class="label">Customer service · email →</div></a><a class="case" href="/work/blood-testing-panel/"><div class="shot"><img src="/assets/screenshots/blood-panel.jpg" alt="Blood test dashboard showing biomarkers against reference ranges (demo data)" width="2000" height="1250" loading="lazy"></div><h3>Blood Testing Panel</h3><p>Raw lab exports turned into a colour-coded, trend-aware health panel.</p><div class="label">Health · data &amp; reporting →</div></a><a class="case" href="/work/trading-tool/"><div class="shot"><img src="/assets/screenshots/trading.jpg" alt="ICTEdge Pro trading dashboard with live signals" width="2000" height="1250" loading="lazy"></div><h3>Trading Tool</h3><p>Live market data, configurable rules, and one screen of clean signals.</p><div class="label">Fintech · data &amp; signals →</div></a></div></section><section><div class="label"><span>How it works</span><span>04 steps</span></div><div class="cards"><div class="card"><div class="n">01</div><h3>A free 15-minute call</h3><p>Tell me what eats your week. No jargon, no obligation.</p></div><div class="card"><div class="n">02</div><h3>A clear plan</h3><p>What I'd automate, what it saves you, and the price — agreed before any work starts.</p></div><div class="card"><div class="n">03</div><h3>Built around you</h3><p>Set up on the tools you already use and tested on your real orders, emails and data.</p></div><div class="card"><div class="n">04</div><h3>Running and supported</h3><p>I keep an eye on it and adjust it as your business grows.</p></div></div></section><section id="book">
+<div class="label"><span>Get in touch</span><span>Reply within two working days</span></div>
+<div class="book-wrap">
+<div class="prose"><h2>Tell me which part is <em>eating your time.</em></h2>
+<p>Orders, bookings, follow-ups, spreadsheets — whatever you're doing by hand every week, tell me about it. I'll reply within two working days to set up a free 15-minute call.</p>
+</div>
+<form data-enquiry>
+<div class="t">Book a free 15-minute call</div>
+<div class="s">Tell me a little and I'll reply with times</div>
+<label>Your name<input name="name" type="text" autocomplete="name"></label>
+<label>Business<input name="business" type="text" autocomplete="organization"></label>
+<label>Email or phone *<input name="contact" type="text" required autocomplete="email"></label>
+<label>What's taking up your time? *<textarea name="message" rows="4" required></textarea></label>
+<input class="hp" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+<button type="submit">Send <span>→</span></button>
+<p data-enquiry-status></p>
+</form>
+</div>
+</section>
+</main>
+<footer><div class="wrap">
+<span>Built by hand · © 2026 Besfort Hyseni</span>
+<nav><a href="/">Home</a><a href="/work/">Case studies</a><a href="/ai-automation-agency/">AI automation</a><a href="/business-automation/">Business automation</a><a href="/n8n-automation/">n8n</a><a href="/leeds/">Leeds</a></nav>
+</div></footer>
+</body>
+</html>

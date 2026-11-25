@@ -30,7 +30,7 @@ export async function onRequest({ request, env }) {
 
   if (session) {
     const { results } = await env.DB.prepare(
-      `SELECT ts, type, label, href, value, scroll
+      `SELECT ts, type, label, href, value, scroll, path
        FROM events WHERE session = ?1 ORDER BY ts, id LIMIT 500`
     ).bind(session.slice(0, 40)).all();
     return json({ session, events: results });

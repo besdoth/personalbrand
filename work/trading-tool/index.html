@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());(function(){try{var o=new URLSearchParams(location.search).get("optout");if(o==="1"||(o!=="0"&&localStorage.getItem("bes.optout")==="1"))return;}catch(e){}var s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtm.js?id=GTM-T3QVFWTX";document.head.appendChild(s);})();</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trading Tool: Market Signals &amp; Alerts Dashboard | Bes</title>
+<meta name="description" content="A trading tool that pulls live market data, runs a configurable rule set, and surfaces clean signals on a single screen.">
+<link rel="canonical" href="https://besiserver.co.uk/work/trading-tool/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://besiserver.co.uk/work/trading-tool/">
+<meta property="og:title" content="Trading Tool: Market Signals &amp; Alerts Dashboard | Bes">
+<meta property="og:description" content="A trading tool that pulls live market data, runs a configurable rule set, and surfaces clean signals on a single screen.">
+<meta property="og:image" content="https://besiserver.co.uk/assets/screenshots/trading.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/assets/fonts/InstrumentSerif-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/Archivo.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:Archivo;src:url(/assets/fonts/Archivo.woff2) format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:Serif;src:url(/assets/fonts/InstrumentSerif-Regular.woff2) format('woff2');font-display:swap}
+@font-face{font-family:Serif;font-style:italic;src:url(/assets/fonts/InstrumentSerif-Italic.woff2) format('woff2');font-display:swap}
+@font-face{font-family:Mono;src:url(/assets/fonts/JetBrainsMono.woff2) format('woff2');font-weight:100 900;font-display:swap}
+:root{--paper:#f4f2ea;--ink:#16170f;--rust:#7a3b1f;--mute:rgba(22,23,15,.6);--line:rgba(22,23,15,.16);--card:#ece9de}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.65 Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{max-width:100%;height:auto;display:block}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.eyebrow,.crumbs,.nav,.label{font-family:Mono,ui-monospace,monospace}
+header{position:sticky;top:0;z-index:10;background:rgba(244,242,234,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;justify-content:space-between;min-height:62px;padding-top:8px;padding-bottom:8px}
+.brand{font-family:Serif,Georgia,serif;font-size:26px;text-decoration:none;letter-spacing:-.01em}
+.brand span{font-family:Mono,monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-left:10px}
+.nav{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase}
+.nav a{text-decoration:none;color:var(--mute)}
+.nav a:hover,.nav a[aria-current]{color:var(--ink)}
+.nav .book{color:var(--rust)}
+.crumbs{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:40px 0 0}
+.crumbs a{text-decoration:none}
+.eyebrow{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--rust);margin:28px 0 0}
+h1,h2,h3{font-family:Serif,Georgia,serif;font-weight:400;letter-spacing:-.015em;margin:0}
+h1{font-size:clamp(42px,7.4vw,88px);line-height:.98;margin-top:18px;max-width:16ch}
+h1 em,h2 em{color:var(--rust)}
+h2{font-size:clamp(32px,4.6vw,50px);line-height:1.05}
+h3{font-size:27px;line-height:1.12}
+.lede{font-size:clamp(18px,2.2vw,21px);line-height:1.6;color:rgba(22,23,15,.76);max-width:60ch;margin:26px 0 0}
+.ctas{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:30px}
+.cta{font-family:Mono,monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--rust);border-bottom:1px solid var(--rust);padding-bottom:6px}
+.cta.alt{color:var(--mute);border-color:var(--line)}
+section{padding:72px 0 0}
+.label{display:flex;justify-content:space-between;gap:12px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);padding-bottom:14px;border-bottom:1px solid var(--ink);margin-bottom:8px}
+.prose{max-width:66ch;color:rgba(22,23,15,.78)}
+.prose p{margin:18px 0 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(250px,100%),1fr));gap:0 36px}
+.card{padding:26px 0 28px;border-bottom:1px solid var(--line)}
+.card .n{font-family:Mono,monospace;font-size:11px;color:var(--rust)}
+.card h3{margin-top:12px}
+.card p{margin:10px 0 0;font-size:15.5px;color:rgba(22,23,15,.68)}
+.ticks{list-style:none;padding:0;margin:18px 0 0;max-width:66ch}
+.ticks li{padding:12px 0 12px 30px;border-bottom:1px solid var(--line);position:relative;color:rgba(22,23,15,.8)}
+.ticks li::before{content:"";position:absolute;left:4px;top:21px;width:12px;height:7px;border:solid var(--rust);border-width:0 0 2px 2px;transform:rotate(-45deg)}
+.feature{display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:center;margin-top:26px}
+.shot{border:1px solid var(--line);background:var(--card);padding:10px}
+.cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:28px;margin-top:26px}
+.case{text-decoration:none;display:block}
+.case .shot{aspect-ratio:16/10;overflow:hidden;padding:0}
+.case .shot img{width:100%;height:100%;object-fit:cover;object-position:top center}
+.case h3{margin-top:16px}
+.case p{margin:6px 0 0;font-size:15.5px;color:rgba(22,23,15,.66)}
+.case .label{border:0;padding:0;margin:10px 0 0;color:var(--rust)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:18px 32px;padding:22px 0;margin-top:40px;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);font-family:Mono,monospace;font-size:13px}
+.meta b{display:block;font-weight:400;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.figure{margin:36px 0 0}
+.figure figcaption{font-family:Mono,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-top:12px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:18px 0 0;max-width:66ch}
+.steps li{counter-increment:s;display:grid;grid-template-columns:46px 1fr;gap:12px;padding:18px 0;border-bottom:1px solid var(--line);color:rgba(22,23,15,.8)}
+.steps li::before{content:counter(s,decimal-leading-zero);font-family:Mono,monospace;font-size:12px;color:var(--rust);padding-top:4px}
+.impact{font-family:Serif,Georgia,serif;font-size:clamp(26px,3.4vw,36px);line-height:1.22;max-width:30ch;margin-top:20px}
+details{border-bottom:1px solid var(--line);padding:18px 0;max-width:72ch}
+summary{cursor:pointer;font-family:Serif,Georgia,serif;font-size:24px;line-height:1.25;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";float:right;font-family:Mono,monospace;color:var(--rust)}
+details[open] summary::after{content:"–"}
+details p{margin:12px 0 0;color:rgba(22,23,15,.76)}
+.book-wrap{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;margin-top:26px}
+form{background:var(--ink);color:var(--paper);padding:28px 28px 24px}
+form .t{font-family:Serif,Georgia,serif;font-size:30px;line-height:1.1}
+form .s{font-family:Mono,monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#d9c3b4;margin-top:8px}
+form label{display:block;margin-top:18px;font-family:Mono,monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,242,234,.62)}
+form input,form textarea{display:block;width:100%;margin-top:8px;padding:12px 14px;background:rgba(244,242,234,.06);border:1px solid rgba(244,242,234,.24);border-radius:0;color:var(--paper);font:16px Archivo,system-ui,sans-serif}
+form textarea{resize:vertical}
+form button{margin-top:22px;width:100%;display:flex;justify-content:space-between;padding:16px 18px;background:var(--paper);color:var(--ink);border:0;font-family:Mono,monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+form .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+[data-enquiry-status]{margin:14px 0 0;min-height:1.5em;font-size:14px}
+.related{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:22px}
+footer{margin-top:90px;border-top:1px solid var(--line);padding:26px 0 48px;font-family:Mono,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:14px 28px;justify-content:space-between}
+footer nav{display:flex;flex-wrap:wrap;gap:10px 22px}
+footer a{text-decoration:none}
+@media (max-width:760px){.feature,.book-wrap{grid-template-columns:1fr}.brand span{display:none}section{padding-top:56px}}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "ProfessionalService", "@id": "https://besiserver.co.uk/#business", "name": "Bes", "alternateName": "Bes — automation for small businesses", "url": "https://besiserver.co.uk/", "image": "https://besiserver.co.uk/assets/og.jpg", "description": "Automation for UK small businesses: AI customer-email inboxes, order and booking pipelines, follow-ups, reporting dashboards and websites wired into them.", "founder": {"@type": "Person", "@id": "https://besiserver.co.uk/#besfort", "name": "Besfort Hyseni", "jobTitle": "Automation developer", "url": "https://besiserver.co.uk/"}, "areaServed": [{"@type": "Country", "name": "United Kingdom"}, {"@type": "City", "name": "Leeds"}], "knowsAbout": ["Business process automation", "AI automation", "n8n", "Workflow automation", "AI agents", "Email automation", "Web development"]}, {"@type": "Article", "@id": "https://besiserver.co.uk/work/trading-tool/#article", "headline": "Trading Tool: Live market data, configurable rules, and one screen of clean signals.", "description": "A trading tool that pulls live market data, runs a configurable rule set, and surfaces clean signals on a single screen.", "image": "https://besiserver.co.uk/assets/screenshots/trading.jpg", "datePublished": "2026-11-25", "dateModified": "2026-11-25", "author": {"@id": "https://besiserver.co.uk/#besfort"}, "publisher": {"@id": "https://besiserver.co.uk/#business"}, "mainEntityOfPage": "https://besiserver.co.uk/work/trading-tool/"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://besiserver.co.uk/"}, {"@type": "ListItem", "position": 2, "name": "Case studies", "item": "https://besiserver.co.uk/work/"}, {"@type": "ListItem", "position": 3, "name": "Trading Tool", "item": "https://besiserver.co.uk/work/trading-tool/"}]}]}</script>
+<script defer src="/assets/js/track.js"></script>
+<script defer src="/assets/js/enquiry.js"></script>
+</head>
+<body>
+<header><div class="wrap">
+<a class="brand" href="/">Bes<span>automation for small businesses</span></a>
+<nav class="nav"><a href="/work/" aria-current="page">Work</a><a href="/ai-automation-agency/">AI automation</a><a href="/n8n-automation/">n8n</a><a href="/leeds/">Leeds</a><a class="book" href="#book">Book a call</a></nav>
+</div></header>
+<main class="wrap">
+<p class="crumbs"><a href="/">Home</a> / <a href="/work/">Case studies</a> / Trading Tool</p>
+<p class="eyebrow">Case study · Fintech · data &amp; signals</p>
+<h1>Trading Tool</h1>
+<p class="lede">A trading tool that pulls live market data, runs a configurable rule set, and surfaces clean signals on a single screen.</p>
+<div class="meta"><div><b>Role</b>Design, front end, alerting layer</div><div><b>Stack</b>Market-data APIs, real-time charting, alerting layer, configurable rules</div><div><b>Status</b>Running</div><div><b>Live</b>Private</div></div>
+<figure class="figure"><div class="shot"><img src="/assets/screenshots/trading.jpg" alt="ICTEdge Pro trading dashboard with live signals" width="2000" height="1250"></div>
+<figcaption>ICTEdge Pro trading dashboard with live signals</figcaption></figure>
+<section><div class="label"><span>01 — The problem</span><span></span></div><div class="prose"><p>Watching for setups meant keeping ten browser tabs open and reading charts manually. Decisions were made on a fragmented view, and anything that happened away from the screen was simply missed.</p></div></section>
+<section><div class="label"><span>02 — The system</span><span></span></div><ol class="steps"><li><span>Live market data is ingested continuously from provider APIs into one normalised feed.</span></li><li><span>A configurable set of indicators and rules is evaluated against the feed in real time.</span></li><li><span>Matches surface as alerts and a focused watchlist, so the screen shows conclusions rather than raw charts.</span></li></ol></section>
+<section><div class="label"><span>03 — The impact</span><span></span></div><p class="impact">Scattered manual chart-watching consolidated into one automated, alert-driven cockpit.</p></section>
+<section><div class="label"><span>Next case study</span><span></span></div>
+<p><a class="cta" href="/work/birria-birria/">Birria Birria →</a></p>
+<div class="related"><a class="cta alt" href="/business-automation/">Business automation →</a><a class="cta alt" href="/ai-automation-agency/">AI automation →</a><a class="cta alt" href="/n8n-automation/">n8n automation →</a></div></section>
+<section id="book">
+<div class="label"><span>Get in touch</span><span>Reply within two working days</span></div>
+<div class="book-wrap">
+<div class="prose"><h2>Tell me which part is <em>eating your time.</em></h2>
+<p>Orders, bookings, follow-ups, spreadsheets — whatever you're doing by hand every week, tell me about it. I'll reply within two working days to set up a free 15-minute call.</p>
+</div>
+<form data-enquiry>
+<div class="t">Want something like this?</div>
+<div class="s">Tell me a little and I'll reply with times</div>
+<label>Your name<input name="name" type="text" autocomplete="name"></label>
+<label>Business<input name="business" type="text" autocomplete="organization"></label>
+<label>Email or phone *<input name="contact" type="text" required autocomplete="email"></label>
+<label>What's taking up your time? *<textarea name="message" rows="4" required></textarea></label>
+<input class="hp" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+<button type="submit">Send <span>→</span></button>
+<p data-enquiry-status></p>
+</form>
+</div>
+</section>
+</main>
+<footer><div class="wrap">
+<span>Built by hand · © 2026 Besfort Hyseni</span>
+<nav><a href="/">Home</a><a href="/work/">Case studies</a><a href="/ai-automation-agency/">AI automation</a><a href="/business-automation/">Business automation</a><a href="/n8n-automation/">n8n</a><a href="/leeds/">Leeds</a></nav>
+</div></footer>
+</body>
+</html>

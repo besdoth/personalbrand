@@ -1,0 +1,19 @@
+# Bes — automation for small businesses
+
+> Besfort Hyseni (Bes) builds automations for UK small businesses: AI customer-email inboxes, order and booking pipelines, follow-ups, reporting dashboards and the websites wired into them, mostly in n8n. Every project starts with a free 15-minute call and a price agreed before work starts.
+
+## Services
+- [AI Automation Agency for UK Small Businesses](https://besiserver.co.uk/ai-automation-agency/): AI automations that answer customer emails, sort enquiries and handle admin for UK small businesses — built on your own tools, with you in control.
+- [Business Automation Consultant for Small Businesses](https://besiserver.co.uk/business-automation/): Automate orders, bookings, follow-ups, reports and admin. A UK automation consultant who builds it and looks after it, with the price agreed upfront.
+- [n8n Automation Agency & Developer (UK)](https://besiserver.co.uk/n8n-automation/): n8n workflows designed, built and looked after for UK businesses — AI agents, Gmail, Sheets, webhooks and payment APIs. See a real n8n build.
+- [Automation & Web Development in Leeds](https://besiserver.co.uk/leeds/): Automation and web development for Leeds businesses — ordering systems, AI email inboxes and dashboards, for clients like Birria Birria and Abode.
+
+## Case studies
+- [Birria Birria](https://besiserver.co.uk/work/birria-birria/): An order-to-kitchen system for a birria restaurant in Leeds that turns scattered DMs and online orders into a single live prep queue.
+- [Abode Email Support](https://besiserver.co.uk/work/abode-email-support/): An AI support inbox for Abode in Leeds: every customer email is read, sorted and answered automatically, and refunds wait for a yes on Telegram before they go out.
+- [Blood Testing Panel](https://besiserver.co.uk/work/blood-testing-panel/): A blood-panel dashboard that ingests lab results and turns rows of numbers into a readable, colour-coded health story.
+- [Trading Tool](https://besiserver.co.uk/work/trading-tool/): A trading tool that pulls live market data, runs a configurable rule set, and surfaces clean signals on a single screen.
+
+## Contact
+- Enquiries: the form on any page
+- Home: https://besiserver.co.uk/
