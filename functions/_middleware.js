@@ -56,9 +56,28 @@ const TITLE = "Bes — Automation for small businesses";
 const DESCRIPTION = "I build automations that take orders, bookings, follow-ups and reports off your plate, " +
   "so your business can grow without more admin. Book a free 15-minute call.";
 
+/* Who this is, for search engines and AI assistants. Keep in step with the
+   BUSINESS block in scripts/build_pages.py (the static pages carry the same). */
+function schema(origin) {
+  const business = {
+    "@type": "ProfessionalService", "@id": `${origin}/#business`, name: "Bes",
+    alternateName: "Bes — automation for small businesses", url: `${origin}/`, image: `${origin}/assets/og.jpg`,
+    description: "Automation for UK small businesses: AI customer-email inboxes, order and booking pipelines, " +
+      "follow-ups, reporting dashboards and websites wired into them.",
+    founder: { "@type": "Person", "@id": `${origin}/#besfort`, name: "Besfort Hyseni", jobTitle: "Automation developer" },
+    areaServed: [{ "@type": "Country", name: "United Kingdom" }, { "@type": "City", name: "Leeds" }],
+    knowsAbout: ["Business process automation", "AI automation", "n8n", "Workflow automation", "AI agents",
+      "Email automation", "Web development"]
+  };
+  const site = { "@type": "WebSite", "@id": `${origin}/#website`, url: `${origin}/`, name: "Bes",
+    publisher: { "@id": `${origin}/#business` } };
+  const json = JSON.stringify({ "@context": "https://schema.org", "@graph": [business, site] }).replace(/</g, "\\u003c");
+  return `<script type="application/ld+json">${json}</script>`;
+}
+
 function seo(origin) {
   const attr = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
-  return [
+  return schema(origin) + [
     `<meta name="description" content="${attr(DESCRIPTION)}">`,
     `<link rel="canonical" href="${origin}/">`,
     `<meta property="og:type" content="website">`,

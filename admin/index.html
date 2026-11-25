@@ -475,6 +475,19 @@ const SCREENS = [
   [/^two halves/i, "Profile"],
   [/^tell me which part/i, "Enquiries"]
 ];
+/* Static pages (landing pages, case studies) have their own URLs. */
+const PAGE_NAMES = {
+  "/": "Home", "/work/": "Case studies", "/ai-automation-agency/": "AI automation page",
+  "/business-automation/": "Business automation page", "/n8n-automation/": "n8n page", "/leeds/": "Leeds page"
+};
+function pageName(path) {
+  let p = "/";
+  try { p = new URL(path || "/", location.origin).pathname; } catch (e) {}
+  if (p === "/index.html") p = "/";
+  if (PAGE_NAMES[p]) return PAGE_NAMES[p];
+  const m = p.match(/^\/work\/([^/]+)\/?$/);
+  return m ? m[1].split("-").map(cap).join(" ") + " (case study)" : p;
+}
 function screen(label) {
   for (const [re, name] of SCREENS) if (re.test(label || "")) return name;
   return label || "?";
@@ -551,7 +564,7 @@ function language(v) {
 
 function visitRow(v) {
   const open = OPEN.has(v.session);
-  const path = ["Home", ...String(v.path || "").split("|").filter(Boolean).map(screen)]
+  const path = [pageName(v.entry), ...String(v.path || "").split("|").filter(Boolean).map(screen)]
     .filter((s, i, a) => s !== a[i - 1]);
   const badges = [
     v.visit_no > 1 ? `<span class="pill">visit ${v.visit_no} of ${v.visits}</span>` : `<span class="pill good">new</span>`,
@@ -584,7 +597,7 @@ function step(e, start) {
   const at = `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
   const lbl = esc(e.label || "");
   const what = {
-    pageview: "Arrived on the site",
+    pageview: `Arrived on <b>${esc(pageName(e.path))}</b>`,
     view: `Opened <b>${esc(screen(e.label))}</b>`,
     section: `Read “${lbl}”`,
     click: `Clicked “${lbl}”`,
