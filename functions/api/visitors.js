@@ -6,6 +6,7 @@
  *   days=1|7|30|90|all   window (default 30)
  *   bots=1               include crawlers and link-preview fetchers
  *   source=instagram     only visits that came from Instagram
+ *   source=leads         only visits that sent an enquiry
  *   offset=0, limit=30   paging (limit up to 1000)
  */
 import { json, requireAdmin } from "../_auth.js";
@@ -16,7 +17,8 @@ const CLICKS = "type IN ('click','outbound','email','phone')";
 // names itself in the user agent; l.instagram.com is its link redirector.
 const SOURCES = {
   instagram: `session IN (SELECT session FROM events WHERE ts >= ?1 AND (
-    tag IN ('ig','instagram') OR ref_host LIKE '%instagram.com' OR ua LIKE '%Instagram %'))`
+    tag IN ('ig','instagram') OR ref_host LIKE '%instagram.com' OR ua LIKE '%Instagram %'))`,
+  leads: "session IN (SELECT session FROM enquiries WHERE session IS NOT NULL)"
 };
 
 export async function onRequest({ request, env }) {
@@ -56,6 +58,7 @@ export async function onRequest({ request, env }) {
                 MAX(CASE WHEN type = 'scroll' THEN value WHEN type = 'engage' THEN scroll END) AS scroll,
                 SUM(CASE WHEN ${CLICKS} THEN 1 ELSE 0 END) AS clicks,
                 SUM(CASE WHEN type = 'email' THEN 1 ELSE 0 END) AS emails,
+                SUM(CASE WHEN type = 'enquiry' THEN 1 ELSE 0 END) AS enquiries,
                 SUM(CASE WHEN type = 'outbound' THEN 1 ELSE 0 END) AS outbound
          FROM events
          WHERE ts >= ?1 AND ${bots} AND ${source} AND session IS NOT NULL

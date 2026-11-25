@@ -182,6 +182,19 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .steps .t { color: var(--muted); font-variant-numeric: tabular-nums; }
 .more { margin-top: 12px; }
 
+/* ----------------------------------------------------------------- leads */
+.lead { border-top: 1px solid var(--grid); padding: 18px 0 8px; }
+.lead:first-of-type { border-top: 0; padding-top: 4px; }
+.lead .lh { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; align-items: baseline; }
+.lead .lname { font-weight: 600; font-size: 15.5px; }
+.lead .lname span { font-weight: 400; color: var(--ink-2); }
+.lead .lcontact { margin-top: 3px; font-size: 14px; }
+.lead .lcontact a { color: var(--series-1); text-decoration: none; }
+.lead .msg {
+  margin: 12px 0 10px; padding: 11px 14px; background: var(--plane); border-left: 3px solid var(--series-2);
+  font-size: 14px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
 /* ------------------------------------------------------------------ tabs */
 .tabs {
   display: flex; gap: 2px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none;
@@ -245,6 +258,7 @@ section[data-pane] > .grid, section[data-pane] > .card, #insta > .grid, #insta >
 
   <nav class="tabs" id="tabs" role="tablist">
     <button role="tab" data-tab="overview">Overview</button>
+    <button role="tab" data-tab="leads">Leads<span class="count" id="cLeads"></span></button>
     <button role="tab" data-tab="visitors">Visitors<span class="count" id="cVisitors"></span></button>
     <button role="tab" data-tab="instagram">Instagram<span class="count" id="cInsta"></span></button>
     <button role="tab" data-tab="feed">Live feed</button>
@@ -253,6 +267,10 @@ section[data-pane] > .grid, section[data-pane] > .card, #insta > .grid, #insta >
   <section data-pane="overview">
     <div id="summary"></div>
     <div id="content"></div>
+  </section>
+
+  <section data-pane="leads" hidden>
+    <div id="leads"></div>
   </section>
 
   <section data-pane="visitors" hidden>
@@ -290,6 +308,8 @@ let DATA = null;
 let VISITS = null;              // { visits: [...], total }
 let INSTA = null;               // the same shape, Instagram visits only
 let INSTA_SHOWN = 30;           // how many of them the list shows
+let LEADS = [];                 // enquiries from the site's form
+const LEAD_VISITS = new Map();  // session id -> the visit an enquiry came from
 const OPEN = new Set();         // visits expanded in the list
 const JOURNEYS = new Map();     // session id -> its events, in order
 
@@ -357,12 +377,17 @@ const range = () => `days=${encodeURIComponent(DAYS)}&bots=${BOTS ? 1 : 0}`;
 async function refresh() {
   try {
     const keep = Math.max(30, VISITS ? VISITS.visits.length : 0);
-    const [stats, visits, insta] = await Promise.all([
+    const [stats, visits, insta, leads, leadVisits] = await Promise.all([
       api(`/api/stats?${range()}&limit=200`),
       api(`/api/visitors?${range()}&limit=${keep}`),
       // Every Instagram visit in range: the tab's figures are computed from them.
-      api(`/api/visitors?${range()}&source=instagram&limit=1000`)
+      api(`/api/visitors?${range()}&source=instagram&limit=1000`),
+      api(`/api/enquiries?${range()}`),
+      api(`/api/visitors?days=all&bots=1&source=leads&limit=1000`)
     ]);
+    LEADS = leads.enquiries;
+    LEAD_VISITS.clear();
+    leadVisits.visits.forEach((v) => LEAD_VISITS.set(v.session, v));
     // Re-fetch open timelines so a visit that's still going stays current.
     await Promise.all([...OPEN].map(async (s) =>
       JOURNEYS.set(s, (await api(`/api/visitors?session=${encodeURIComponent(s)}`)).events)));
@@ -390,7 +415,7 @@ function showApp(ready) {
 }
 
 /* ------------------------------------------------------------------- tabs */
-const TABS = ["overview", "visitors", "instagram", "feed"];
+const TABS = ["overview", "leads", "visitors", "instagram", "feed"];
 function currentTab() {
   const t = location.hash.slice(1);
   return TABS.includes(t) ? t : "overview";
@@ -436,13 +461,15 @@ $("#gateForm").addEventListener("submit", async (ev) => {
 $("#logoutBtn").addEventListener("click", async () => {
   await fetch("/api/logout", { method: "POST" }).catch(() => {});
   VISITS = null; INSTA = null; OPEN.clear(); JOURNEYS.clear();
-  ["#visitors", "#insta", "#summary", "#content", "#feedPane"].forEach((s) => { $(s).innerHTML = ""; });
+  LEADS = []; LEAD_VISITS.clear();
+  ["#leads", "#visitors", "#insta", "#summary", "#content", "#feedPane"].forEach((s) => { $(s).innerHTML = ""; });
   gate("");
 });
 
 /* --------------------------------------------------------------- visitors */
 /* The site has one URL; each screen is known by its headline. */
 const SCREENS = [
+  [/^scale the business/i, "Home"],
   [/^manual work/i, "Home"],
   [/^\w+ builds,/i, "Work"],
   [/^two halves/i, "Profile"],
@@ -528,6 +555,7 @@ function visitRow(v) {
     .filter((s, i, a) => s !== a[i - 1]);
   const badges = [
     v.visit_no > 1 ? `<span class="pill">visit ${v.visit_no} of ${v.visits}</span>` : `<span class="pill good">new</span>`,
+    v.enquiries ? `<span class="pill hot">sent an enquiry</span>` : "",
     v.emails ? `<span class="pill hot">tapped your email</span>` : "",
     v.outbound ? `<span class="pill">left via a link</span>` : "",
     v.bot ? `<span class="pill">bot</span>` : ""
@@ -562,6 +590,7 @@ function step(e, start) {
     click: `Clicked “${lbl}”`,
     outbound: `Left for <span class="mono">${esc(String(e.href || "").replace(/^https?:\/\//, ""))}</span>`,
     email: "<b>Tapped your email address</b>",
+    enquiry: "<b>Sent you an enquiry</b>",
     phone: "<b>Tapped your phone number</b>",
     scroll: `Scrolled ${e.value}% down`,
     engage: `Closed the tab — ${secs(e.value)} active, reached ${e.scroll || 0}%`
@@ -609,6 +638,38 @@ function renderLists() {
   const list = $("#instaList");
   if (list) list.innerHTML = visitList(INSTA.visits.slice(0, INSTA_SHOWN), INSTA.visits.length, "instaMore",
     "No Instagram visits in this period.");
+  $("#cLeads").textContent = LEADS.length ? nf.format(LEADS.length) : "";
+  $("#leads").innerHTML = leadsHtml();
+}
+
+/* ------------------------------------------------------------------ leads */
+function contactLink(s) {
+  s = String(s || "").trim();
+  if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s)) return `<a href="mailto:${esc(s)}">${esc(s)}</a>`;
+  if (/^\+?[\d\s().-]{7,}$/.test(s)) return `<a href="tel:${esc(s.replace(/[^\d+]/g, ""))}">${esc(s)}</a>`;
+  return esc(s);
+}
+function leadCard(e) {
+  const v = LEAD_VISITS.get(e.session);
+  return `<div class="lead">
+    <div class="lh">
+      <div class="lname">${esc(e.name || "No name given")}${e.business ? ` <span>· ${esc(e.business)}</span>` : ""}</div>
+      <div class="when" title="${esc(new Date(e.ts).toLocaleString("en-GB"))}">${esc(when(e.ts))}</div>
+    </div>
+    <div class="lcontact">${contactLink(e.contact)}</div>
+    <div class="msg">${esc(e.message)}</div>
+    ${v ? `<div class="visits">${visitRow(v)}</div>`
+        : `<p class="hint">${flag(e.country)} ${esc(e.city || country(e.country))} · their visit wasn't tracked (opted out or blocked)</p>`}
+  </div>`;
+}
+function leadsHtml() {
+  if (!LEADS.length) {
+    return `<div class="card"><p class="empty">No enquiries in this period yet. They come from the form on your Enquiries page, and each one shows up here with the visit it came from.</p></div>`;
+  }
+  return `<div class="card">
+    <header><div><h2>Leads</h2><div class="hint">Enquiries from your site's form, newest first. Tap the visit under one to see what they looked at first.</div></div></header>
+    ${LEADS.map(leadCard).join("")}
+  </div>`;
 }
 
 /* ---------------------------------------------------------------- instagram */
@@ -652,7 +713,7 @@ function renderInsta() {
     { name: "Opened another page", visits: all.filter((v) => screensOf(v).some((s) => s !== "Home")).length },
     { name: "Opened a project", visits: all.filter((v) => screensOf(v).some((s) => !PAGES.includes(s))).length },
     { name: "Went to Enquiries", visits: all.filter((v) => screensOf(v).includes("Enquiries")).length },
-    { name: "Tapped your email", visits: all.filter((v) => v.emails > 0).length }
+    { name: "Got in touch", visits: all.filter((v) => v.emails > 0 || v.enquiries > 0).length }
   ];
   const tile = (k, v, sub) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div>${sub ? `<div class="n">${sub}</div>` : ""}</div>`;
   const count = (rows, head, empty) => barTable(rows, [
@@ -671,7 +732,7 @@ function renderInsta() {
         ${tile("Time on site", avg ? secs(avg) : "—", "average, when measured")}
         ${tile("Looked around", pct(funnel[2].visits, n), "opened another page")}
         ${tile("Opened a project", pct(funnel[3].visits, n), `${fmt(funnel[3].visits)} visits`)}
-        ${tile("Tapped your email", fmt(funnel[5].visits), pct(funnel[5].visits, n) + " of visits")}
+        ${tile("Got in touch", fmt(funnel[5].visits), "enquiry or email tap")}
         ${tile("Stayed in the app", pct(inApp, n), "used Instagram's browser")}
       </div>
     </div>

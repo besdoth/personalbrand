@@ -63,3 +63,22 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 );
 
 CREATE INDEX IF NOT EXISTS idx_login_attempts ON login_attempts (ip_hash, ts);
+
+-- The enquiry form (functions/api/enquiry.js). visitor/session link a lead
+-- to the visit it came from.
+CREATE TABLE IF NOT EXISTS enquiries (
+  id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts       INTEGER NOT NULL,
+  name     TEXT,
+  business TEXT,
+  contact  TEXT NOT NULL,
+  message  TEXT NOT NULL,
+  visitor  TEXT,
+  session  TEXT,
+  country  TEXT,
+  city     TEXT,
+  ip_hash  TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_enquiries_ts ON enquiries (ts);
+CREATE INDEX IF NOT EXISTS idx_enquiries_ip ON enquiries (ip_hash, ts);

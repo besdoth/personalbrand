@@ -65,6 +65,15 @@ Health check after deploying: `https://besiserver.co.uk/api/health`.
 
 ## Editing content
 
+> **The rebrand lives in `index.html`.** The headline, services, process,
+> profile copy and the enquiry form were edited directly in the bundled
+> template. Re-exporting the old design from Claude Design will overwrite
+> them, so update the design there before exporting again.
+>
+> The page title, description and link-preview tags are added by
+> `functions/_middleware.js` (they survive re-exports); the preview image is
+> `assets/og.jpg` (1200×630).
+
 All project copy, stats and metadata live in one array (`data`) inside the
 inline script in `index.html` — search for `birria-birria`. Each entry holds:
 

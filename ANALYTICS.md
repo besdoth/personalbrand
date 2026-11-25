@@ -9,6 +9,7 @@ can query yourself with SQL.
 
 | Question | Where it shows up |
 |---|---|
+| **Leads** — every enquiry sent through the site's form, with the visit it came from | "Leads" tab |
 | **Each visit, one by one** — where, which device, how they arrived, and every step they took | "Visitors" (tap a visit to open its timeline) |
 | **Instagram, in depth** — share of traffic, tap-to-contact funnel, time of day, exact phone models, languages, places, projects opened | "Instagram" tab |
 | How many real people came, and when | Hero figure + "Over time" |
@@ -114,6 +115,9 @@ functions/api/track.js  receives events, stamps geo from the edge, writes to D1
 functions/api/login.js  password -> session cookie (with lockout); logout.js ends it
 functions/api/stats.js  aggregate queries for the dashboard (signed-in only)
 functions/api/visitors.js  per-visit list and timelines (signed-in only)
+functions/api/enquiry.js   receives the Enquiries form (honeypot + 5/hour per address)
+functions/api/enquiries.js the Leads tab's list (signed-in only)
+assets/js/enquiry.js       sends the form; injected like the tracker, so opting out of tracking doesn't break it
 functions/api/health.js unauthenticated wiring check
 admin/index.html        the dashboard
 schema.sql              the table
